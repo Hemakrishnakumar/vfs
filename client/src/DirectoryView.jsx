@@ -5,6 +5,7 @@ import CreateDirectoryModal from "./components/CreateDirectoryModal";
 import RenameModal from "./components/RenameModal";
 import DirectoryList from "./components/DirectoryList";
 import "./DirectoryView.css";
+import toast from "react-hot-toast";
 
 function DirectoryView() {
   const BASE_URL = "http://localhost:4000";
@@ -136,7 +137,8 @@ function DirectoryView() {
     if (type === "directory") {
       navigate(`/directory/${id}`);
     } else {
-      window.location.href = `${BASE_URL}/file/${id}`;
+      console.log('file is opened')
+      window.open(`${BASE_URL}/file/${id}`, null);
     }
   }
 
@@ -267,8 +269,10 @@ function DirectoryView() {
       });
       await handleFetchErrors(response);
       getDirectoryItems();
+      toast.success('Deleted successfully')
     } catch (error) {
       setErrorMessage(error.message);
+      toast.error(error.message)
     }
   }
 
@@ -281,6 +285,7 @@ function DirectoryView() {
       });
       await handleFetchErrors(response);
       getDirectoryItems();
+      toast.success('Deleted successfully')
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -304,6 +309,7 @@ function DirectoryView() {
       setNewDirname("New Folder");
       setShowCreateDirModal(false);
       getDirectoryItems();
+      toast.success('Directory Created');
     } catch (error) {
       setErrorMessage(error.message);
     }
