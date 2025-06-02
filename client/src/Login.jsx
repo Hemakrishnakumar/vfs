@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
+import { useAuth } from "./context/AuthContext.jsx";
+import { useEffect } from "react";
 
 const Login = () => {
   const BASE_URL = "http://localhost:4000";
@@ -12,8 +14,15 @@ const Login = () => {
 
   // serverError will hold the error message from the server
   const [serverError, setServerError] = useState("");
+  const {user} = useAuth();  
 
   const navigate = useNavigate();
+  
+  useEffect(()=>{
+    if(user?.name) {
+      navigate('/');
+    }
+  },[])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
