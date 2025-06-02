@@ -58,9 +58,9 @@ export const deleteDirectory = async (req, res, next) => {
   if(directory.userId !== user._id.toString()) 
     return res.status(403).json({message: 'You are not authorized to delete this resource'})
     //Delete all associated files
-    await files.deleteMany({parentDirId: new ObjectId(id)});
+    await files.deleteMany({parentDirId: id});
     // Delete all child directories
-    await directories.deleteMany({parentDirId: new ObjectId(id)});
+    await directories.deleteMany({parentDirId: id});
     //delete the directory
     await directories.deleteOne({_id: directory._id})  
     return res.status(200).json({message:'deleted successfully'})

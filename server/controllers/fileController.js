@@ -1,24 +1,23 @@
 import { ObjectId } from "mongodb";
 import { directories, files } from "../config/database.js";
 import {createWriteStream} from "fs";
+import { rm } from "fs/promises";
 import path from "path";
+import mime from 'mime'
 
 export const uploadFile = async (req, res, next) => {
   const parentDirId = req.params.parentDirId || req.user.rootDirId;
   const parentDirData = await directories.findOne({_id: new ObjectId(parentDirId), userId: req.user._id.toString()});
-
   // Check if parent directory exists
   if (!parentDirData) {
     return res.status(404).json({ error: "Parent directory not found!" });
-  }  
-
+  }
   // Check if the directory belongs to the user
   if (parentDirData.userId !== req.user._id.toString()) {
     return res.status(403).json({
       error: "You do not have permission to upload to this directory.",
     });
   }
-
   const filename = req.headers.filename || "untitled";  
   const extension = path.extname(filename);
   let insertedFile = await files.insertOne({     
@@ -30,6 +29,10 @@ export const uploadFile = async (req, res, next) => {
   const fullFileName = `${insertedFile.insertedId.toString()}${extension}`;
   const writeStream = createWriteStream(`./storage/${fullFileName}`);
   req.pipe(writeStream);
+  req.on('error', async (error)=>{    
+    await files.findOneAndDelete({_id: insertedFile.insertedId});
+    return res.status(404).json({message:'something went wrong while uploading the file'})
+  })
   req.on('end', ()=>{
     return res.status(201).json({ message: "File Uploaded" });  
   })  
@@ -38,7 +41,6 @@ export const uploadFile = async (req, res, next) => {
 export const getFile = async (req, res) => {
   const { id } = req.params;
   const fileData = await files.findOne({_id: new ObjectId(id)});
-
   // Check if file exists
   if (!fileData) {
     return res.status(404).json({ error: "File not found!" });
@@ -49,14 +51,13 @@ export const getFile = async (req, res) => {
       .status(403)
       .json({ error: "You don't have access to this file." });
   }
-  // If "download" is requested, set the appropriate headers
   const filePath = `${process.cwd()}/storage/${id}${fileData.extension}`;
-
+  // If "download" is requested, set the appropriate headers
   if (req.query.action === "download") {
     return res.download(filePath, fileData.name);
-  }
-
-  // Send file
+  } 
+  const mimeType = mime.getType(filePath);
+  res.setHeader("Content-Type", mimeType);
   return res.sendFile(filePath, (err) => {
     if (!res.headersSent && err) {
       return res.status(404).json({ error: "File not found!" });
@@ -79,6 +80,7 @@ export const deleteFile = async (req, res, next) => {
   const { id } = req.params;  
   const file = await files.findOneAndDelete({_id: new ObjectId(id), userId: req.user._id.toString()});
   if (!file)
-    return res.status(400).json({message: 'Either file not found or you do not have access to delete'});  
+    return res.status(400).json({message: 'Either file not found or you do not have access to delete'}); 
+  await rm(path.join(`${process.cwd()}/storage/`, `${id}${file.extension}`)); 
   return res.status(200).json({ message: "File Deleted Successfully" });  
 }

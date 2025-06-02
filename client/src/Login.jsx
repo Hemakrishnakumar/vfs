@@ -22,7 +22,7 @@ const Login = () => {
     if(user?.name) {
       navigate('/');
     }
-  },[])
+  },[user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
