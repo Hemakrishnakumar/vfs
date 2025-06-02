@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
 
 const Register = () => {
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "http://localhost:4000";
 
   const [formData, setFormData] = useState({
     name: "Anurag Singh",
@@ -39,7 +39,7 @@ const Register = () => {
     setIsSuccess(false); // reset success if any
 
     try {
-      const response = await fetch(`${BASE_URL}/user`, {
+      const response = await fetch(`${BASE_URL}/user/register`, {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
