@@ -1,10 +1,11 @@
 import express from "express";
 import { deleteFile, getFile, updateFile, uploadFile } from "../controllers/fileController.js";
+import validateIdMiddleware from "../middlewares/validateIdMiddleware.js";
 
 const router = express.Router();
 
-// router.param("parentDirId", validateIdMiddleware);
-// router.param("id", validateIdMiddleware);
+router.param("parentDirId", validateIdMiddleware);
+router.param("id", validateIdMiddleware);
 
 router.post("/{:parentDirId}", uploadFile );
 

@@ -7,6 +7,7 @@ import {
   FaSignOutAlt,
   FaSignInAlt,
 } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 function DirectoryHeader({
   directoryName,
@@ -20,6 +21,7 @@ function DirectoryHeader({
   const BASE_URL = "http://localhost:4000";
 
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const {user} = useAuth();
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest User");
   const [userEmail, setUserEmail] = useState("guest@example.com");
@@ -30,33 +32,18 @@ function DirectoryHeader({
   // -------------------------------------------
   // 1. Fetch user info from /user on mount
   // -------------------------------------------
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await fetch(`${BASE_URL}/user`, {
-          credentials: "include",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          // Set user info if logged in
-          setUserName(data.name);
-          setUserEmail(data.email);
-          setLoggedIn(true);
-        } else if (response.status === 401) {
-          // User not logged in
-          setUserName("Guest User");
-          setUserEmail("guest@example.com");
-          setLoggedIn(false);
-        } else {
-          // Handle other error statuses if needed
-          console.error("Error fetching user info:", response.status);
-        }
-      } catch (err) {
-        console.error("Error fetching user info:", err);
-      }
-    }
-    fetchUser();
-  }, [BASE_URL]);
+ useEffect(()=>{
+  if(user?.name) {
+    setUserName(user?.name);
+    setUserEmail(user?.email);
+    setLoggedIn(true);
+  }
+  else {
+    setUserName("Guest User");
+    setUserEmail("guest@example.com");
+    setLoggedIn(false);
+  }
+ })
 
   // -------------------------------------------
   // 2. Toggle user menu

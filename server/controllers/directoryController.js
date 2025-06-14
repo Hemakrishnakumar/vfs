@@ -1,5 +1,25 @@
 import { ObjectId } from "mongodb";
 import { directories, files } from "../config/database.js";
+import {rm} from 'fs/promises'
+import path from "path";
+
+ async function deleteDirectoryData (id) {
+    //delete all the files in the directory.
+    const filesList = await files.find({parentDirId: id}, {projection:{_id:1, extension: 1}}).toArray();
+    for(let i = 0; i<filesList.length; i++){
+      const {_id, extension} = filesList[i];
+      await files.deleteOne({_id});
+      await rm(path.join(`${process.cwd()}/storage/`, `${_id.toString()}${extension}`));
+    }
+    // Get All the directories in it.
+    const list = await directories.find({parentDirId: id},{projection: {_id: 1}}).toArray();
+    //delete that directory
+    await directories.deleteOne({_id: new ObjectId(id)});
+    //delete all the child directories along with it's data.
+    for(let i = 0; i< list.length; i++) {
+      await deleteDirectoryData(list[i]._id.toString());
+    }
+}
 
 export const getDirectories = async (req, res) => {
   const user = req.user;
@@ -50,18 +70,10 @@ export const updateDirectory = async (req, res, next) => {
 
 export const deleteDirectory = async (req, res, next) => {
   const user = req.user;
-  const { id } = req.params;
-    
-  const directory = await directories.findOne({_id: new ObjectId(id)});
+  const { id } = req.params;    
+  const directory = await directories.findOne({_id: new ObjectId(id), userId: user._id.toString()});
   if(!directory)
-     return res.status(404).json({message: 'No Such directory exists'});    
-  if(directory.userId !== user._id.toString()) 
-    return res.status(403).json({message: 'You are not authorized to delete this resource'})
-    //Delete all associated files
-    await files.deleteMany({parentDirId: id});
-    // Delete all child directories
-    await directories.deleteMany({parentDirId: id});
-    //delete the directory
-    await directories.deleteOne({_id: directory._id})  
-    return res.status(200).json({message:'deleted successfully'})
+     return res.status(404).json({message: 'No Such directory exists'}); 
+  await deleteDirectoryData(id);  
+  return res.status(200).json({message:'deleted successfully'})
 }

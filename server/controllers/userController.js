@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { directories, users } from "../config/database.js";
 
 export const login = async (req, res, next) => {
@@ -24,19 +25,21 @@ export const register = async (req, res, next) => {
         "A user with this email address already exists. Please try logging in or use a different email.",
     });
   }
-
-  const user = await users.insertOne({   
+  const userId = new ObjectId();
+  const rootDirId = new ObjectId();
+  await users.insertOne({
+    _id: userId, 
     name,
     email,
     password,
+    rootDirId: rootDirId.toString()
   });
 
-  const directory =await directories.insertOne({    
+  await directories.insertOne({    
     name: `root-${email}`,
-    userId: user.insertedId.toString(),
+    userId: userId.toString(),
     parentDirId: null,    
   });
-  await users.findOneAndUpdate({_id: user.insertedId}, { $set: {rootDirId: directory.insertedId.toString()}});      
   res.status(201).json({ message: "User Registered" });  
 }
 
