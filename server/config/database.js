@@ -1,6 +1,6 @@
 import {MongoClient} from 'mongodb';
-import { configDotenv } from 'dotenv';
-configDotenv()
+import { config } from 'dotenv';
+config()
 
 const client = await MongoClient.connect(process.env.CONNECTION_STRING);
 const db = client.db('vfs');

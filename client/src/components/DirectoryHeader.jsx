@@ -21,7 +21,7 @@ function DirectoryHeader({
   const BASE_URL = "http://localhost:4000";
 
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const {user} = useAuth();
+  const {user, setUser} = useAuth();
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest User");
   const [userEmail, setUserEmail] = useState("guest@example.com");
@@ -68,6 +68,7 @@ function DirectoryHeader({
         setUserName("Guest User");
         setUserEmail("guest@example.com");
         navigate("/login");
+        setUser({});
       } else {
         console.error("Logout failed");
       }

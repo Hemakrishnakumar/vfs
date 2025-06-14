@@ -14,7 +14,7 @@ const Login = () => {
 
   // serverError will hold the error message from the server
   const [serverError, setServerError] = useState("");
-  const {user} = useAuth();  
+  const {user, setUser} = useAuth();  
 
   const navigate = useNavigate();
   
@@ -57,6 +57,7 @@ const Login = () => {
         setServerError(data.error);
       } else {
         // On success, navigate to home or any other protected route
+        setUser(data);
         navigate("/");
       }
     } catch (error) {

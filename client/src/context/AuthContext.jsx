@@ -16,10 +16,8 @@ export default function AuthProvider ({children}) {
             });
             const data = await response.json();
             if (data.error) {
-                // If there's an error, set the serverError message
-                setServerError(data.error);
+                return;                
             } else {
-                console.log({data});
                 setUser(data);
                 // On success, navigate to home or any other protected route                
             }
@@ -32,7 +30,7 @@ export default function AuthProvider ({children}) {
         getUser();
     }, [])
 
-    return <AuthContext.Provider value={{user}}>
+    return <AuthContext.Provider value={{user, setUser}}>
         {children}
     </AuthContext.Provider>
 }

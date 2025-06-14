@@ -11,7 +11,7 @@ export const login = async (req, res, next) => {
     httpOnly: true,
     maxAge: 60 * 1000 * 60 * 24 * 7,
   });
-  res.json({ message: "logged in" });
+  res.json({name: user.name, email: user.email, message: "logged in" });
 }
 
 export const register = async (req, res, next) => {
