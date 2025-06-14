@@ -2,11 +2,16 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
+import PropTypes from 'prop-types';
 
 const BASE_URL = 'http://localhost:4000'
 const AuthContext = createContext(null);
 
 export default function AuthProvider ({children}) {
+    AuthProvider.propTypes = {
+        children: PropTypes.node.isRequired
+    };
+
     const [user, setUser] = useState(null);
 
     const getUser = async () => {
@@ -34,5 +39,4 @@ export default function AuthProvider ({children}) {
         {children}
     </AuthContext.Provider>
 }
-
 export const useAuth = () => useContext(AuthContext);

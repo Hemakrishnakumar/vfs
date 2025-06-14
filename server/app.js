@@ -26,7 +26,7 @@ app.use("/user", userRoutes);
 
 app.use((err, req, res, next) => {
   console.log(err);
-  res.status(err.status || 500).json({ message: "Something went wrong!!" });
+  res.status(err.status || 500).json({ error: "Something went wrong!!", message: err.message });
 });
 
 app.listen(PORT, () => {

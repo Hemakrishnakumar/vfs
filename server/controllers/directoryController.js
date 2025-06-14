@@ -14,20 +14,20 @@ import path from "path";
     // Get All the directories in it.
     const list = await directories.find({parentDirId: id},{projection: {_id: 1}}).toArray();
     //delete that directory
-    await directories.deleteOne({_id: new ObjectId(id)});
+    await directories.deleteOne({_id: id});
     //delete all the child directories along with it's data.
     for(let i = 0; i< list.length; i++) {
-      await deleteDirectoryData(list[i]._id.toString());
+      await deleteDirectoryData(list[i]._id);
     }
 }
 
 export const getDirectories = async (req, res) => {
   const user = req.user;
-  const id = req.params.id || user.rootDirId;
+  const id = req.params?.id && new ObjectId(req.params?.id) || user.rootDirId;
 
   // Find the directory and verify ownership
   const directoryData = await directories.findOne(
-    {_id : new ObjectId(id)}
+    {_id : id}
   );
   if (!directoryData) {
     return res
@@ -42,9 +42,9 @@ export const getDirectories = async (req, res) => {
 
 export const createDirectory = async (req, res, next) => {
   const user = req.user;
-  const parentDirId = req.params.parentDirId || user.rootDirId;
+  const parentDirId = req.params.parentDirId && new ObjectId(req.params.parentDirId) || user.rootDirId;
   const dirname = req.headers.dirname || "New Folder";  
-  const parentDir = await directories.findOne({_id :new ObjectId(parentDirId), userId: user._id.toString() });
+  const parentDir = await directories.findOne({_id : parentDirId, userId: user._id });
   if (!parentDir)
     return res
       .status(404)
@@ -52,7 +52,7 @@ export const createDirectory = async (req, res, next) => {
   await directories.insertOne({    
     name: dirname,
     parentDirId,   
-    userId: user._id.toString()   
+    userId: user._id   
   });
   return res.status(200).json({ message: "Directory Created!" });  
 }
@@ -62,7 +62,7 @@ export const updateDirectory = async (req, res, next) => {
   const { id } = req.params;
   const { newDirName } = req.body;
 
-  const dirData =await directories.findOneAndUpdate({_id: new ObjectId(id), userId: user._id.toString()}, { $set :{ name: newDirName}});
+  const dirData =await directories.findOneAndUpdate({_id: new ObjectId(id), userId: user._id}, { $set :{ name: newDirName}});
   if (!dirData)
     return res.status(404).json({ message: "Directory not found!" });
     res.status(200).json({ message: "Directory Renamed!" }); 
@@ -71,9 +71,9 @@ export const updateDirectory = async (req, res, next) => {
 export const deleteDirectory = async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;    
-  const directory = await directories.findOne({_id: new ObjectId(id), userId: user._id.toString()});
+  const directory = await directories.findOne({_id: new ObjectId(id), userId: user._id});
   if(!directory)
      return res.status(404).json({message: 'No Such directory exists'}); 
-  await deleteDirectoryData(id);  
+  await deleteDirectoryData(directory._id);  
   return res.status(200).json({message:'deleted successfully'})
 }

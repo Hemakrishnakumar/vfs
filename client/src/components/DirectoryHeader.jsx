@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types';
 import {
   FaFolderPlus,
   FaUpload,
@@ -180,4 +181,11 @@ function DirectoryHeader({
   );
 }
 
-export default DirectoryHeader;
+DirectoryHeader.propTypes = {
+  directoryName: PropTypes.string.isRequired,
+  onCreateFolderClick: PropTypes.func.isRequired,
+  onUploadFilesClick: PropTypes.func.isRequired,
+  fileInputRef: PropTypes.object.isRequired,
+  handleFileSelect: PropTypes.func.isRequired,
+  disabled: PropTypes.bool
+};export default DirectoryHeader;

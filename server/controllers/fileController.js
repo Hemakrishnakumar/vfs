@@ -6,14 +6,14 @@ import path from "path";
 import mime from 'mime'
 
 export const uploadFile = async (req, res, next) => {
-  const parentDirId = req.params.parentDirId || req.user.rootDirId;
-  const parentDirData = await directories.findOne({_id: new ObjectId(parentDirId), userId: req.user._id.toString()});
+  const parentDirId = req.params?.parentDirId && new ObjectId(req.params?.parentDirId)  || req.user.rootDirId;
+  const parentDirData = await directories.findOne({_id: parentDirId, userId: req.user._id});
   // Check if parent directory exists
   if (!parentDirData) {
     return res.status(404).json({ error: "Parent directory not found!" });
   }
   // Check if the directory belongs to the user
-  if (parentDirData.userId !== req.user._id.toString()) {
+  if (parentDirData.userId.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       error: "You do not have permission to upload to this directory.",
     });
@@ -24,7 +24,7 @@ export const uploadFile = async (req, res, next) => {
       extension,
       name: filename,
       parentDirId,
-      userId: req.user._id.toString()
+      userId: req.user._id
   });   
   const fullFileName = `${insertedFile.insertedId.toString()}${extension}`;
   const writeStream = createWriteStream(`./storage/${fullFileName}`);
@@ -46,7 +46,7 @@ export const getFile = async (req, res) => {
     return res.status(404).json({ error: "File not found!" });
   }
   // Check ownership  
-  if (fileData.userId !== req.user._id.toString()) {
+  if (fileData.userId.toString() !== req.user._id.toString()) {
     return res
       .status(403)
       .json({ error: "You don't have access to this file." });
@@ -70,7 +70,7 @@ export const updateFile = async (req, res, next) => {
   const {newFilename} = req.body;
   if(!id || !newFilename)
     return res.status(400).json({message: 'Invaid request'});
-  const fileData = await files.findOneAndUpdate({_id: new ObjectId(id), userId: req.user._id.toString()}, {$set : {name: newFilename}});
+  const fileData = await files.findOneAndUpdate({_id: new ObjectId(id), userId: req.user._id}, {$set : {name: newFilename}});
   if (!fileData)
     return res.status(404).json({message: 'File not found'})
   return res.status(200).json({ message: "Renamed" });  
@@ -78,7 +78,7 @@ export const updateFile = async (req, res, next) => {
 
 export const deleteFile = async (req, res, next) => {
   const { id } = req.params;  
-  const file = await files.findOneAndDelete({_id: new ObjectId(id), userId: req.user._id.toString()});
+  const file = await files.findOneAndDelete({_id: new ObjectId(id), userId: req.user._id});
   if (!file)
     return res.status(400).json({message: 'Either file not found or you do not have access to delete'}); 
   await rm(path.join(`${process.cwd()}/storage/`, `${id}${file.extension}`)); 

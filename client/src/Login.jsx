@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
 import { useAuth } from "./context/AuthContext.jsx";
@@ -9,7 +9,7 @@ const Login = () => {
 
   const [formData, setFormData] = useState({
     email: "krish@gmail.com",
-    password: "krish123",
+    password: "Krish@2020",
   });
 
   // serverError will hold the error message from the server
@@ -22,7 +22,7 @@ const Login = () => {
     if(user?.name) {
       navigate('/');
     }
-  },[user]);
+  },[user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,7 +116,7 @@ const Login = () => {
 
       {/* Link to the register page */}
       <p className="link-text">
-        Don't have an account? <Link to="/register">Register</Link>
+        Don&apos;t have an account? <Link to="/register">Register</Link>
       </p>
     </div>
   );

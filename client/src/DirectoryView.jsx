@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DirectoryHeader from "./components/DirectoryHeader";
@@ -245,6 +246,7 @@ function DirectoryView() {
 
     // Remove from progressMap
     setProgressMap((prev) => {
+      // eslint-disable-next-line no-unused-vars
       const { [tempId]: _, ...rest } = prev;
       return rest;
     });
