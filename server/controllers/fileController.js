@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
-import { directories, files } from "../config/database.js";
+import Directory from "../models/directoryModel.js"
+import File from "../models/fileModel.js";
 import {createWriteStream} from "fs";
 import { rm } from "fs/promises";
 import path from "path";
@@ -7,7 +8,7 @@ import mime from 'mime'
 
 export const uploadFile = async (req, res, next) => {
   const parentDirId = req.params?.parentDirId && new ObjectId(req.params?.parentDirId)  || req.user.rootDirId;
-  const parentDirData = await directories.findOne({_id: parentDirId, userId: req.user._id});
+  const parentDirData = await Directory.findOne({_id: parentDirId, userId: req.user._id});
   // Check if parent directory exists
   if (!parentDirData) {
     return res.status(404).json({ error: "Parent directory not found!" });
@@ -20,7 +21,7 @@ export const uploadFile = async (req, res, next) => {
   }
   const filename = req.headers.filename || "untitled";  
   const extension = path.extname(filename);
-  let insertedFile = await files.insertOne({     
+  let insertedFile = await File.insertOne({     
       extension,
       name: filename,
       parentDirId,
@@ -30,7 +31,7 @@ export const uploadFile = async (req, res, next) => {
   const writeStream = createWriteStream(`./storage/${fullFileName}`);
   req.pipe(writeStream);
   req.on('error', async (error)=>{    
-    await files.findOneAndDelete({_id: insertedFile.insertedId});
+    await File.findOneAndDelete({_id: insertedFile.insertedId});
     return res.status(404).json({message:'something went wrong while uploading the file'})
   })
   req.on('end', ()=>{
@@ -40,7 +41,7 @@ export const uploadFile = async (req, res, next) => {
 
 export const getFile = async (req, res) => {
   const { id } = req.params;
-  const fileData = await files.findOne({_id: new ObjectId(id)});
+  const fileData = await File.findOne({_id: new ObjectId(id)});
   // Check if file exists
   if (!fileData) {
     return res.status(404).json({ error: "File not found!" });
@@ -70,7 +71,7 @@ export const updateFile = async (req, res, next) => {
   const {newFilename} = req.body;
   if(!id || !newFilename)
     return res.status(400).json({message: 'Invaid request'});
-  const fileData = await files.findOneAndUpdate({_id: new ObjectId(id), userId: req.user._id}, {$set : {name: newFilename}});
+  const fileData = await File.findOneAndUpdate({_id: new ObjectId(id), userId: req.user._id}, {$set : {name: newFilename}});
   if (!fileData)
     return res.status(404).json({message: 'File not found'})
   return res.status(200).json({ message: "Renamed" });  
@@ -78,7 +79,7 @@ export const updateFile = async (req, res, next) => {
 
 export const deleteFile = async (req, res, next) => {
   const { id } = req.params;  
-  const file = await files.findOneAndDelete({_id: new ObjectId(id), userId: req.user._id});
+  const file = await File.findOneAndDelete({_id: new ObjectId(id), userId: req.user._id});
   if (!file)
     return res.status(400).json({message: 'Either file not found or you do not have access to delete'}); 
   await rm(path.join(`${process.cwd()}/storage/`, `${id}${file.extension}`)); 

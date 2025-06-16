@@ -1,10 +1,13 @@
 import { ObjectId } from "mongodb";
-import { directories, users } from "../config/database.js";
-import { client } from "../config/database.js";
+import User from "../models/userModel.js";
+import Directory from "../models/directoryModel.js";
+import mongoose from "mongoose";
+
+
 
 export const login = async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await users.findOne({ email });
+  const { email, password } = req.body;  
+  const user = await User.findOne({email});  
   if (!user || user.password !== password) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
@@ -18,7 +21,7 @@ export const login = async (req, res, next) => {
 export const register = async (req, res, next) => {
   const { name, email, password } = req.body;
 
-  const foundUser = await users.findOne({ email });
+  const foundUser = await User.findOne({ email });
   if (foundUser) {
     return res.status(409).json({
       error: "User already exists",
@@ -28,10 +31,10 @@ export const register = async (req, res, next) => {
   }
   const userId = new ObjectId();
   const rootDirId = new ObjectId();
-  const session = client.startSession();
+  const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    await users.insertOne({
+    await User.insertOne({
       _id: userId,
       name,
       email,
@@ -39,12 +42,11 @@ export const register = async (req, res, next) => {
       rootDirId: rootDirId
     }, { session });
 
-    await directories.insertOne({
+    await Directory.insertOne({
       _id: rootDirId,
       name: `root-${email}`,
       userId: userId,
-      parentDirId: null,
-      age: 20
+      parentDirId: null
     }, { session });
   } catch (err) {
     session.abortTransaction()

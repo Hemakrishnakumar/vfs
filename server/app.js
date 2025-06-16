@@ -7,9 +7,14 @@ import directoryRoutes from "./routes/directoryRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
+import mongoose from "mongoose";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+mongoose.connect(process.env.CONNECTION_STRING)
+  .then(() => console.log("DB CONNECTED!!"))
+  .catch((err) => console.log('Falied to connect to db', err.message));
 
 app.use(cookieParser());
 app.use(express.json());
