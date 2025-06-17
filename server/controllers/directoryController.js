@@ -3,6 +3,7 @@ import {rm} from 'fs/promises';
 import path from "path";
 import Directory from "../models/directoryModel.js";
 import File from "../models/fileModel.js";
+import { dir } from "console";
 
 
  async function deleteDirectoryData (id) {
@@ -36,12 +37,11 @@ export const getDirectories = async (req, res) => {
       .status(404)
       .json({ error: "Directory not found or you do not have access to it!" });
   }   
-  const filesData = await File.find({parentDirId: id});
-  const result = await Directory.find({parentDirId: id}).select({name:1, parentDirId: 1});
-  console.log(result);
-  directoryData.directories = result || [];
+  const filesData = await File.find({parentDirId: id}).select({name:1, parentDirId: 1, extension: 1});
+  const directories = await Directory.find({parentDirId: id}).select({name:1, parentDirId: 1});
+  const result = { id: directoryData._id, name: directoryData.name, directories: directories.map(dir=>({ id: dir._id, name: dir.name, parentDirId: dir.parentDirId})) , files: filesData.map(file=>({id: file._id, name: file.name, extension: file.extension, parentDirId: file.parentDirId}))};
 
-  return res.status(200).json(directoryData);
+  return res.status(200).json(result);
 }
 
 export const createDirectory = async (req, res, next) => {

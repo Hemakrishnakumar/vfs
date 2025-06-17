@@ -27,7 +27,7 @@ export const uploadFile = async (req, res, next) => {
       parentDirId,
       userId: req.user._id
   });   
-  const fullFileName = `${insertedFile.insertedId.toString()}${extension}`;
+  const fullFileName = `${insertedFile._id.toString()}${extension}`;
   const writeStream = createWriteStream(`./storage/${fullFileName}`);
   req.pipe(writeStream);
   req.on('error', async (error)=>{    
