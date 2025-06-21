@@ -7,12 +7,14 @@ const directory = new Schema({
     },
     userId: {
         type: Schema.ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     },
     parentDirId: {
-        type: Schema.ObjectId        
+        type: Schema.ObjectId,
+        ref: 'Directory'
     }
-});
+}, { strict: 'throw' });
 
 export default model('Directory', directory);
 

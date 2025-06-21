@@ -14,7 +14,16 @@ const PORT = process.env.PORT || 4000;
 
 mongoose.connect(process.env.CONNECTION_STRING)
   .then(() => console.log("DB CONNECTED!!"))
-  .catch((err) => console.log('Falied to connect to db', err.message));
+  .catch((err) => {
+    console.log('Falied to connect to db', err);
+    process.exit(1);
+  });
+
+process.on('SIGINT', async () => {
+  await mongoose.disconnect();
+  console.log('⛔Database disconnected⛔');
+  process.exit(0);
+})
 
 app.use(cookieParser());
 app.use(express.json());

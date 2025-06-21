@@ -7,13 +7,16 @@ const file = new Schema({
     },
     extension: String,
     userId: {
-        type: Schema.ObjectId,
-        required: true
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     },
     parentDirId: {
-        type: Schema.ObjectId        
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Directory'
     }
-},{timestamps: true});
+}, { timestamps: true, strict: 'throw' });
 
 export default model('File', file);
 
