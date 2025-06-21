@@ -14,7 +14,7 @@ const directory = new Schema({
         type: Schema.ObjectId,
         ref: 'Directory'
     }
-}, { strict: 'throw' });
+}, { strict: 'throw', timestamps: true });
 
 export default model('Directory', directory);
 
