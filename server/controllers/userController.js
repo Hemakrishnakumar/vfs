@@ -19,15 +19,6 @@ export const login = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
   const { name, email, password } = req.body;
-
-  const foundUser = await User.findOne({ email });
-  if (foundUser) {
-    return res.status(409).json({
-      error: "User already exists",
-      message:
-        "A user with this email address already exists. Please try logging in or use a different email.",
-    });
-  }
   const userId = new ObjectId();
   const rootDirId = new ObjectId();
   const session = await mongoose.startSession();
@@ -48,8 +39,10 @@ export const register = async (req, res, next) => {
       parentDirId: null
     }, { session });
   } catch (err) {
-    session.abortTransaction()
-    next(err);
+    session.abortTransaction();
+    if (err.code === 11000)
+      return res.status(409).json({ error: 'An user with this email already exists' });
+    return next(err);
   }
   await session.commitTransaction();
   res.status(201).json({ message: "User Registered" });

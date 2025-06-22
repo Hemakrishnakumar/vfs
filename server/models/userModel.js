@@ -11,6 +11,7 @@ const userSchema = new Schema({
    email: {
       type: String,
       required: [true, "Email address is mandatory"],
+      unique: true, //it is not a validator, it creates the unique index on database level.
       lowercase: true,
       match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email"],
    },
