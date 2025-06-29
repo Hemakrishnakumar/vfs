@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 const BASE_URL = 'http://localhost:4000'
 const AuthContext = createContext(null);
 
-export default function AuthProvider ({children}) {
+export default function AuthProvider({ children }) {
     AuthProvider.propTypes = {
         children: PropTypes.node.isRequired
     };
@@ -21,21 +21,23 @@ export default function AuthProvider ({children}) {
             });
             const data = await response.json();
             if (data.error) {
-                return;                
+                return;
             } else {
                 setUser(data);
                 // On success, navigate to home or any other protected route                
             }
         } catch (error) {
-            console.error("Error:", error);            
+            console.error("Error:", error);
         }
-    };    
+    };
 
-    useEffect(()=>{
+    useEffect(() => {
+        if (user?.name)
+            return;
         getUser();
     }, [])
 
-    return <AuthContext.Provider value={{user, setUser}}>
+    return <AuthContext.Provider value={{ user, setUser }}>
         {children}
     </AuthContext.Provider>
 }

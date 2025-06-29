@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import crypto from 'node:crypto';
 
 
 const userSchema = new Schema({
@@ -50,6 +51,7 @@ const userSchema = new Schema({
 userSchema.pre('save', async function () {
    //Hashing the password only when password has been either created or modified.
    if (!this.isModified('password')) return;
+   //this.password = crypto.createHash('sha256').update(this.password).digest('hex');
    this.password = await bcrypt.hash(this.password, 12);
 });
 
@@ -57,6 +59,7 @@ userSchema.pre('save', async function () {
 //METHODS
 userSchema.methods.comparePassword = async (enteredPassword, password) =>
    await bcrypt.compare(enteredPassword, password)
+   //crypto.createHash('sha256').update(enteredPassword).digest('hex') === password
 
 
 
