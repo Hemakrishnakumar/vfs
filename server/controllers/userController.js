@@ -2,10 +2,10 @@ import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
 import Directory from "../models/directoryModel.js";
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
+import jwt from "../utils/jwt.js";
 
 
-const getJWTToken = user => jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
+const getJWTToken = user => jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
 export const login = async (req, res, next) => {
   const { email, password } = req.body;

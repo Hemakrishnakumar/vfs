@@ -7,11 +7,13 @@ import RenameModal from "./components/RenameModal";
 import DirectoryList from "./components/DirectoryList";
 import "./DirectoryView.css";
 import toast from "react-hot-toast";
+import { useAuth } from "./context/AuthContext";
 
 function DirectoryView() {
   const BASE_URL = "http://localhost:4000";
   const { dirId } = useParams();
   const navigate = useNavigate();
+  const {setUser} = useAuth();
 
   // Displayed directory name
   const [directoryName, setDirectoryName] = useState("My Drive");
@@ -71,6 +73,7 @@ function DirectoryView() {
       });
 
       if (response.status === 401) {
+        setUser({});
         navigate("/login");
         return;
       }

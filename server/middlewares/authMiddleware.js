@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt from "../utils/jwt.js";
 import User from "../models/userModel.js";
 
 export default async function checkAuth(req, res, next) {
@@ -17,11 +17,12 @@ export default async function checkAuth(req, res, next) {
     next();
   }
   catch (error) {
+    console.log({error})
     if (error.name === 'JsonWebTokenError' ||
       error.name === 'TokenExpiredError') {
       res.clearCookie("jwt");
       return res.status(401).json({ error: 'not logged in' })
     }
-    next(err);
+    next(error);
   }
 }
