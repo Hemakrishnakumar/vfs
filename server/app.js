@@ -24,7 +24,7 @@ process.on('SIGINT', async () => {
   console.log('⛔Database disconnected⛔');
   process.exit(0);
 })
-app.use(cookieParser());
+app.use(cookieParser(process.env.SECRET));
 // app.use(cookieParser('jwt', {id: 1}, "my-secret" {
 //   httpOnly: true,
 //   signed: true

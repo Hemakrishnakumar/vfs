@@ -1,27 +1,22 @@
-import jwt from "../utils/jwt.js";
-import User from "../models/userModel.js";
+import Session from "../models/sessionModel.js";
 
 export default async function checkAuth(req, res, next) {
-  const { jwt: token } = req.cookies;
-  if (!token)
+  const { sid } = req.signedCookies;  
+  if (!sid){
+    res.clearCookie('sid');
     return res.status(401).json({ error: 'not logged in' });
+  }
   try {
-    const loggedinUser = jwt.verify(token, process.env.JWT_SECRET);
-    if (!loggedinUser?.id)
-      return res.status(401).json({ error: "Invalid token" });
-    const user = await User.findOne({ _id: loggedinUser.id }).lean();
-    if (!user) {
-      return res.status(401).json({ error: "user no longer available in the system" });
+   const session = await Session.findById(sid).populate('user').lean();
+    if (!session)
+        return res.status(401).json({ error: "session expired" });    
+    if (!session.user) {
+      return res.status(404).json({ error: "user no longer available in the system" });
     }
-    req.user = user;
+    req.user = session.user;
     next();
   }
-  catch (error) {
-    if (error.name === 'JsonWebTokenError' ||
-      error.name === 'TokenExpiredError' || 'InvalidToken') {
-      res.clearCookie("jwt");
-      return res.status(401).json({ error: 'not logged in' })
-    }
+  catch (error) {    
     next(error);
   }
 }

@@ -2,10 +2,8 @@ import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
 import Directory from "../models/directoryModel.js";
 import mongoose from "mongoose";
-import jwt from "../utils/jwt.js";
+import Session from "../models/sessionModel.js";
 
-
-const getJWTToken = user => jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -13,9 +11,15 @@ export const login = async (req, res, next) => {
   if (!user || !(await user.comparePassword(password, user.password))) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
-  res.cookie("jwt", getJWTToken(user), {
+  const allSessions = await Session.find({user: user.id});
+  if(allSessions?.length >= 1) {
+    await allSessions[0].deleteOne();
+  }
+  const session = await Session.create({user: user._id});
+  res.cookie("sid", session.id, {
     httpOnly: true,
-    maxAge: 60 * 60 * 1000
+    maxAge: 24 *  60 * 60 * 1000,
+    signed: true
   });
   res.json({ name: user.name, email: user.email, message: "logged in" });
 }
@@ -58,7 +62,8 @@ export const getUser = (req, res) => {
   });
 }
 
-export const logout = (req, res) => {
-  res.clearCookie("jwt");
+export const logout = async (req, res) => {
+  await Session.deleteOne({_id: req.signedCookies.sid})
+  res.clearCookie("sid");
   res.status(204).end();
 }
