@@ -24,8 +24,11 @@ process.on('SIGINT', async () => {
   console.log('⛔Database disconnected⛔');
   process.exit(0);
 })
-
 app.use(cookieParser());
+// app.use(cookieParser('jwt', {id: 1}, "my-secret" {
+//   httpOnly: true,
+//   signed: true
+// }))  signed cookies. we just need to send the payload of cookie. parser internally signs it(Hashed it using a secret)
 app.use(express.json());
 app.use(
   cors({

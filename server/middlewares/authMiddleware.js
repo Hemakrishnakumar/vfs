@@ -17,9 +17,8 @@ export default async function checkAuth(req, res, next) {
     next();
   }
   catch (error) {
-    console.log({error})
     if (error.name === 'JsonWebTokenError' ||
-      error.name === 'TokenExpiredError') {
+      error.name === 'TokenExpiredError' || 'InvalidToken') {
       res.clearCookie("jwt");
       return res.status(401).json({ error: 'not logged in' })
     }

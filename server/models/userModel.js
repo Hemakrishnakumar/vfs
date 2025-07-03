@@ -51,16 +51,26 @@ const userSchema = new Schema({
 userSchema.pre('save', async function () {
    //Hashing the password only when password has been either created or modified.
    if (!this.isModified('password')) return;
-   this.password = crypto.createHash('sha256').update(this.password).digest('hex');
-   //this.password = await bcrypt.hash(this.password, 12);
+   //this.password = crypto.createHash('sha256').update(this.password).digest('hex');
+   
+   // const salt = crypto.randomBytes(16);
+   // const hashedPassword = crypto.pbkdf2Sync(this.password, salt, 100000, 32, 'sha256');
+   // this.password = `${salt.toString('base64url')}.${hashedPassword.toString('base64url')}`;
+
+   this.password = await bcrypt.hash(this.password, 12);
 });
 
 
 //METHODS
-userSchema.methods.comparePassword = async (enteredPassword, password) =>
-   //await bcrypt.compare(enteredPassword, password)
-   crypto.createHash('sha256').update(enteredPassword).digest('hex') === password
-
+userSchema.methods.comparePassword = async (enteredPassword, password) => {
+   //crypto.createHash('sha256').update(enteredPassword).digest('hex') === password  //plain hash. can be guessed using rainbow table.
+   
+   // const [salt, hashedPassword] = password.split('.');
+   // const newHash = crypto.pbkdf2Sync(enteredPassword, Buffer.from(salt, 'base64url'), 100000, 32, 'sha256');
+   // return hashedPassword === newHash.toString('base64url');
+   
+   return await bcrypt.compare(enteredPassword, password)
+}
 
 
 export default model('User', userSchema);
