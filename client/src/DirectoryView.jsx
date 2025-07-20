@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DirectoryHeader from "./components/DirectoryHeader";
@@ -141,8 +140,7 @@ function DirectoryView() {
     if (type === "directory") {
       navigate(`/directory/${id}`);
     } else {
-      console.log('file is opened')
-      window.open(`${BASE_URL}/file/${id}`, null);
+      window.open(`${BASE_URL}/file/${id}`);
     }
   }
 
@@ -290,7 +288,6 @@ function DirectoryView() {
       });
       await handleFetchErrors(response);
       getDirectoryItems();
-      toast.success('Deleted successfully')
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -314,7 +311,6 @@ function DirectoryView() {
       setNewDirname("New Folder");
       setShowCreateDirModal(false);
       getDirectoryItems();
-      toast.success('Directory Created');
     } catch (error) {
       setErrorMessage(error.message);
     }

@@ -1,20 +1,26 @@
 import { model, Schema } from "mongoose";
 
-const directory = new Schema({
+const directorySchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     userId: {
-        type: Schema.ObjectId,
-        required: true,
-        ref: 'User'
+      type: Schema.Types.ObjectId,
+      required: true,
     },
     parentDirId: {
-        type: Schema.ObjectId,
-        ref: 'Directory'
-    }
-}, { strict: 'throw', timestamps: true });
+      type: Schema.Types.ObjectId,
+      default: null,
+      ref: "Directory",
+    },
+  },
+  {
+    strict: "throw",
+  }
+);
 
-export default model('Directory', directory);
+const Directory = model("Directory", directorySchema);
 
+export default Directory;

@@ -3,12 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { handleGoogleLogin } from "./apis/loginWithGoogle.js";
 
 const Login = () => {
   const BASE_URL = "http://localhost:4000";
 
   const [formData, setFormData] = useState({
-    email: "krish@gmail.com",
+    email: "jayavarapukrishna11@gmail.com",
     password: "Krish@2020",
   });
 
@@ -116,8 +118,24 @@ const Login = () => {
 
       {/* Link to the register page */}
       <p className="link-text">
-        Don&apos;t have an account? <Link to="/register">Register</Link>
+        Don't have an account? <Link to="/register">Register</Link>
       </p>
+      <div className="or">
+        <span>Or</span>
+      </div>
+      <GoogleLogin
+        onSuccess={async (data)=>{
+          const res = await handleGoogleLogin(data);
+          if(res.status === 200) 
+            navigate('/');
+        }}
+        shape="pill"               
+        theme="filled_blue"
+        text="continue_with"
+        onError={(err)=>{
+          console.log("login failed",err)
+        }}
+      />
     </div>
   );
 };
