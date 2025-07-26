@@ -159,7 +159,7 @@ function DirectoryHeader({
             title="User Menu"
             onClick={handleUserIconClick}
           >
-            <FaUser />
+            { user?.picture ? <img className="user_picture" src={user.picture} alt="photo" /> : <FaUser />}
           </button>
 
           {showUserMenu && (

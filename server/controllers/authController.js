@@ -54,7 +54,7 @@ export const googleSignin = async (req, res, next) => {
       signed: true,
       maxAge: 60 * 1000 * 60 * 24 * 7,
     });
-    res.json({ message: "logged in" });
+    return res.json({ message: "logged in", user: {email: user.email, name: user.name, picture: user.picture, role: user.role} });
   } catch (err) {
     next(err);
   }

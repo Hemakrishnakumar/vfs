@@ -7,7 +7,8 @@ import directoryRoutes from "./routes/directoryRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import checkAuth from "./middlewares/authMiddleware.js";
+import adminRoutes from "./routes/adminRoutes.js"
+import {checkAuth, protect} from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
 
 
@@ -27,6 +28,7 @@ app.use("/directory", checkAuth, directoryRoutes);
 app.use("/file", checkAuth, fileRoutes);
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
+app.use("/users", checkAuth, adminRoutes);
 
 app.use((err, req, res, next) => {
   console.log(err);

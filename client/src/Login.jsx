@@ -5,13 +5,14 @@ import { useAuth } from "./context/AuthContext.jsx";
 import { useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { handleGoogleLogin } from "./apis/loginWithGoogle.js";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const BASE_URL = "http://localhost:4000";
 
   const [formData, setFormData] = useState({
-    email: "jayavarapukrishna11@gmail.com",
-    password: "Krish@2020",
+    email: "",
+    password: "",
   });
 
   // serverError will hold the error message from the server
@@ -58,8 +59,8 @@ const Login = () => {
         // If there's an error, set the serverError message
         setServerError(data.error);
       } else {
-        // On success, navigate to home or any other protected route
-        setUser(data);
+        // On success, navigate to home or any other protected route        
+        setUser(data?.user);
         navigate("/");
       }
     } catch (error) {
@@ -123,19 +124,27 @@ const Login = () => {
       <div className="or">
         <span>Or</span>
       </div>
-      <GoogleLogin
-        onSuccess={async (data)=>{
-          const res = await handleGoogleLogin(data);
-          if(res.status === 200) 
-            navigate('/');
-        }}
-        shape="pill"               
-        theme="filled_blue"
-        text="continue_with"
-        onError={(err)=>{
-          console.log("login failed",err)
-        }}
-      />
+      <div className="google_login_btn">
+        <GoogleLogin
+          onSuccess={async (data)=>{
+            const res = await handleGoogleLogin(data);
+            if(res?.message === 'logged in') {
+              setUser(res?.user);
+              navigate('/');            
+            }
+            else {
+              toast.error('Login Failed');
+            }
+          }}
+          shape="pill"               
+          theme="default"
+          text="continue_with"
+          size="medium"
+          onError={(err)=>{
+            console.log("login failed",err)
+          }}        
+        />
+      </div>
     </div>
   );
 };

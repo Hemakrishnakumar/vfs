@@ -8,7 +8,10 @@
 /* Heading */
 .heading {
   text-align: center;
+  font-size: 36px;
+  font-weight: 800;
   margin-bottom: 20px;
+  color: #1688f3;
 }
 
 /* Form */
@@ -125,4 +128,11 @@
 .submit-button:disabled {
   background-color: #92a6bc;
   cursor: not-allowed;
+}
+
+.user_picture {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #eee;
+  border-radius: 100%;
 }

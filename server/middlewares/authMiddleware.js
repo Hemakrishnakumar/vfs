@@ -1,6 +1,6 @@
 import Session from "../models/sessionModel.js";
 
-export default async function checkAuth(req, res, next) {
+export const checkAuth = async (req, res, next) => {
   const { sid } = req.signedCookies;
 
   if (!sid) {
@@ -19,4 +19,11 @@ export default async function checkAuth(req, res, next) {
   }
   req.user = session.user;
   next();
+}
+
+export const protect = (...allowedRoles) => (req, res, next) => {  
+  const role = req.user.role;  
+  if(allowedRoles.includes(role))
+    return next();
+  return res.status(403).json({error:'You are not authorized'})
 }

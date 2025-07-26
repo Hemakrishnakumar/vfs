@@ -12,7 +12,7 @@ export default function AuthProvider({ children }) {
         children: PropTypes.node.isRequired
     };
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({});
 
     const getUser = async () => {
         try {

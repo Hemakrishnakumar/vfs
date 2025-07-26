@@ -81,13 +81,15 @@ export const login = async (req, res, next) => {
     signed: true,
     maxAge: 60 * 1000 * 60 * 24 * 7,
   });
-  res.json({ message: "logged in" });
+  res.json({ message: "logged in", user: { email: user.email, name: user.name, picture: user.picture, role:user.role} });
 };
 
 export const getCurrentUser = (req, res) => {
   res.status(200).json({
     name: req.user.name,
     email: req.user.email,
+    picture: req.user.picture,
+    role: req.user.role
   });
 };
 
@@ -105,3 +107,32 @@ export const logoutAll = async (req, res) => {
   res.clearCookie("sid");
   res.status(204).end();
 };
+
+export const getAllUsers = async (req, res, next) => {
+  try{const allUsers = await User.find({}).select('email name').lean();
+  const allSessions = await Session.find({}).lean();
+  const allLoggedInUsers = new Set(allSessions.map(session => session.user.toString()));
+  const data = allUsers.map(user => {
+    return {
+    ...user,
+    id: user._id,
+    isLoggedIn: allLoggedInUsers.has(user._id.toString())
+  }});
+  return res.json(data);
+  }
+  catch(err){
+    next(err);
+  }
+}
+
+export const logoutUserByAdmin = async (req, res, next) => {
+  const {id} = req.params;  
+  try {
+  const response = await Session.deleteMany({user: id});
+  console.log(response);
+  return res.status(204).json({message:'deleted successfully'})
+  }
+  catch(err) {
+    next(err);
+  }
+}

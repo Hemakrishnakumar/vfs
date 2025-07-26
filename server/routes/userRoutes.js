@@ -1,5 +1,5 @@
 import express from "express";
-import checkAuth from "../middlewares/authMiddleware.js";
+import {checkAuth} from "../middlewares/authMiddleware.js";
 import {
   getCurrentUser,
   login,

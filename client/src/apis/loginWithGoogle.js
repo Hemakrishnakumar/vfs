@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 const BASE_URL = "http://localhost:4000";
 
 export const handleGoogleLogin = async (data) => {
@@ -9,10 +11,12 @@ export const handleGoogleLogin = async (data) => {
                 "Content-Type": "application/json",
             },
             credentials: "include",
-        },)
-        return response;
+        });
+        const res = await response.json()
+        return res;
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        return;
     };
 
 }

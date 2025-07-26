@@ -267,8 +267,8 @@ const Register = () => {
           if(res.status === 200) 
             navigate('/');
         }}
-        shape="pill"               
-        theme="filled_blue"
+        shape="rectangle"               
+        theme="default"
         text="signup_with"
         onError={(err)=>{
           console.log("login failed",err)
