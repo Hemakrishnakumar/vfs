@@ -39,13 +39,12 @@
   cursor: pointer;
 }
 
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
 .logout-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
   color: #666666;
-}
-
-
-.logout-btn:hover {
-  background-color: #c0392b;
 }

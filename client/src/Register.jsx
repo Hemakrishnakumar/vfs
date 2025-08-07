@@ -3,14 +3,16 @@ import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
 import { GoogleLogin } from "@react-oauth/google";
 import { handleGoogleLogin } from "./apis/loginWithGoogle";
+import toast from "react-hot-toast";
+import { useAuth } from "./context/AuthContext";
 
 const Register = () => {
   const BASE_URL = "http://localhost:4000";
 
   const [formData, setFormData] = useState({
-    name: "Krishna",
-    email: "jayavarapukirshna11@gmail.com",
-    password: "Krish@2020",
+    name: "",
+    email: "",
+    password: "",
   });
 
   const [serverError, setServerError] = useState("");
@@ -24,6 +26,7 @@ const Register = () => {
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const {setUser} = useAuth();
 
   const navigate = useNavigate();
 
@@ -261,19 +264,27 @@ const Register = () => {
       <div className="or">
         <span>Or</span>
       </div>
-      <GoogleLogin
-        onSuccess={async (data)=>{
-          const res = await handleGoogleLogin(data);
-          if(res.status === 200) 
-            navigate('/');
-        }}
-        shape="rectangle"               
-        theme="default"
-        text="signup_with"
-        onError={(err)=>{
-          console.log("login failed",err)
-        }}
-      />
+      <div className="google_login_btn">
+        <GoogleLogin
+          onSuccess={async (data)=>{
+            const res = await handleGoogleLogin(data);
+            if(res?.message === 'logged in') {
+              setUser(res?.user);
+              navigate('/');            
+            }
+            else {
+              toast.error('Login Failed');
+            }
+          }}
+          shape="pill"               
+          theme="default"
+          text="continue_with"
+          size="medium"
+          onError={(err)=>{
+            console.log("login failed",err)
+          }}        
+        />
+      </div>
     </div>
   );
 };

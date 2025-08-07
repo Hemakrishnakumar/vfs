@@ -39,7 +39,9 @@ const UsersView = () => {
      fetchUsersData();
   }, []);
 
-  const logoutUserHandler = async(id) => {
+  const logoutUserHandler = async(id, name) => {
+    const confirmedByUser = confirm(`are you sure you want to logout ${name}?`);
+    if(!confirmedByUser) return;
     try {
       const res = await fetch(`${BASE_URL}/users/${id}`, {
         method: 'DELETE',
@@ -77,7 +79,7 @@ const UsersView = () => {
                 <td>{user.email}</td>
                 {role === 'manager' ? <td>{ user.isLoggedIn ? 'Logged In': 'Not Logged In'}</td> :                
                 <td>                  
-                    <button onClick={()=> logoutUserHandler(user.id)} className="logout-btn" disabled={!user.isLoggedIn}>
+                    <button onClick={()=> logoutUserHandler(user.id, user.name)} className="logout-btn" disabled={!user.isLoggedIn}>
                       Logout
                     </button>                 
                 </td> }
