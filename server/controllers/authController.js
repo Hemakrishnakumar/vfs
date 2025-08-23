@@ -1,20 +1,20 @@
 import OTP from "../models/otpModel.js";
-import Session from "../models/sessionModel.js";
 import User from "../models/userModel.js";
 import { sendOtpService } from "../services/sendOtpService.js";
 import { OAuth2Client } from "google-auth-library";
 import { createUserAndDirectory } from "./userController.js";
+import redisClient from "../config/redis.js";
+import { GOOGLE_CLIENT_ID, SESSION_EXPIRE_IN_SECONDS } from "../config/constants.js";
 
-const clientId = "280455534344-88ke0uiaorctl65dsrvmv0p5ri2ssjj7.apps.googleusercontent.com";
 
 const client = new OAuth2Client({
-  clientId,
+  clientId: GOOGLE_CLIENT_ID
 })
 
 const verifyToken = async (idToken) => {
   const loginTicket = await client.verifyIdToken({
     idToken,
-    audience: clientId
+    audience: GOOGLE_CLIENT_ID
   })
   const userData = loginTicket.getPayload();
   return userData;
@@ -48,8 +48,8 @@ export const googleSignin = async (req, res, next) => {
     if (!user) {
       user = await createUserAndDirectory({ email, name, picture })
     }
-    const session = await createSession(user._id);
-    res.cookie("sid", session.id, {
+    const sessionId = await createSession(user._id, user.rootDirId);
+    res.cookie("sid", sessionId, {
       httpOnly: true,
       signed: true,
       maxAge: 60 * 1000 * 60 * 24 * 7,
@@ -60,11 +60,14 @@ export const googleSignin = async (req, res, next) => {
   }
 }
 
-export const createSession = async (userId) => {
-  const allSessions = await Session.find({ user: userId });
-
-  if (allSessions.length >= 1) {
-    await allSessions[0].deleteOne();
-  }
-  return await Session.create({ user: userId });
+export const createSession = async (userId, rootDirId) => {
+  // const allSessions = await Session.find({ user: userId });
+  // if (allSessions.length >= 1) {
+  //   await allSessions[0].deleteOne();
+  // }
+  const sessionId = crypto.randomUUID();
+  const redisKey = `sessions:${sessionId}`;
+  await redisClient.json.set(redisKey, '$', {_id:userId, rootDirId});  
+  await redisClient.expire(redisKey, SESSION_EXPIRE_IN_SECONDS);
+  return sessionId;
 }

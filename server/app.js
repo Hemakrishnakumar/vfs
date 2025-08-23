@@ -1,6 +1,4 @@
 import express from "express";
-import { config } from "dotenv";
-config();
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import directoryRoutes from "./routes/directoryRoutes.js";
@@ -8,14 +6,15 @@ import fileRoutes from "./routes/fileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js"
-import {checkAuth, protect} from "./middlewares/authMiddleware.js";
+import {checkAuth} from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
+import { COOKIE_SECRET, PORT } from "./config/constants.js";
 
 
 await connectDB();
 
 const app = express();
-app.use(cookieParser(process.env.SECRET));
+app.use(cookieParser(COOKIE_SECRET));
 app.use(express.json());
 app.use(
   cors({
@@ -35,6 +34,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: "Something went wrong!" });
 });
 
-app.listen(4000, () => {
-  console.log(`Server Started and running on 4000`);
+app.listen(PORT, () => {
+  console.log(`Server Started and running on ${PORT}`);
 });

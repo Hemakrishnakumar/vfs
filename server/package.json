@@ -19,7 +19,8 @@
     "google-auth-library": "^10.1.0",
     "mime-types": "^3.0.1",
     "mongoose": "^8.12.1",
-    "nodemailer": "^7.0.4"
+    "nodemailer": "^7.0.4",
+    "redis": "^5.8.2"
   },
   "devDependencies": {
     "prettier": "^3.4.2"
