@@ -74,7 +74,7 @@ export const login = async (req, res, next) => {
   if (!user || !(await user.comparePassword(password))) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }  
-  const sessionId = await createSession(user._id, user.rootDirId);
+  const sessionId = await createSession(user._id, user.rootDirId, user.role);
 
   res.cookie("sid", sessionId, {
     httpOnly: true,
@@ -102,38 +102,52 @@ export const logout = async (req, res) => {
 };
 
 export const logoutAll = async (req, res) => {
-  const { sid } = req.signedCookies;
-  // const session = await Session.findById(sid);
-  // await Session.deleteMany({ user: session.user });
-  res.clearCookie("sid");
-  res.status(204).end();
+  try {
+    const result = await redisClient.ft.search(
+      'userIdIdx',
+      `@userId:{${req.user._id}}`
+    );
+    await Promise.all(
+      result.documents.map((session) =>
+        redisClient.del(session.id)
+      )
+    );
+    res.clearCookie("sid");
+    res.status(204).end();
+  } catch (err) {
+    console.error("Error in logoutAll:", err);
+    res.status(500).json({ error: "Failed to logout all sessions" });
+  }
 };
 
 export const getAllUsers = async (req, res, next) => {
-  // try{const allUsers = await User.find({}).select('email name').lean();
-  // // const allSessions = await Session.find({}).lean();
-  // // const allLoggedInUsers = new Set(allSessions.map(session => session.user.toString()));
-  // const data = allUsers.map(user => {
-  //   return {
-  //   ...user,
-  //   id: user._id,
-  //   isLoggedIn: allLoggedInUsers.has(user._id.toString())
-  // }});
-  // return res.json(data);
-  // }
-  // catch(err){
-  //   next(err);
-  // }
+  try{const allUsers = await User.find({}).select('email name').lean();
+  const keys = await redisClient.keys("sessions:*");
+  const sessions = await Promise.all(
+    keys.map((key) => redisClient.json.get(key))
+  );  
+  const allLoggedInUsers = new Set(sessions.map(session => session._id));
+  const data = allUsers.map(user => {
+    return {
+    ...user,
+    id: user._id,
+    isLoggedIn: allLoggedInUsers.has(user._id.toString())
+  }});
+  return res.json(data);
+  }
+  catch(err){
+    next(err);
+  }
 }
 
 export const logoutUserByAdmin = async (req, res, next) => {
-  // const {id} = req.params;  
-  // try {
-  // const response = await Session.deleteMany({user: id});
-  // console.log(response);
-  // return res.status(204).json({message:'deleted successfully'})
-  // }
-  // catch(err) {
-  //   next(err);
-  // }
+  const {id} = req.params;  
+  try {
+  const result = await redisClient.ft.search('userIdIdx',`@userId:{${id}}`);
+  await Promise.all(result.documents.map(session=> redisClient.del(session.id)))
+  return res.status(204).json({message:'deleted successfully'})
+  }
+  catch(err) {
+    next(err);
+  }
 }

@@ -48,7 +48,7 @@ export const googleSignin = async (req, res, next) => {
     if (!user) {
       user = await createUserAndDirectory({ email, name, picture })
     }
-    const sessionId = await createSession(user._id, user.rootDirId);
+    const sessionId = await createSession(user._id, user.rootDirId, user.role);
     res.cookie("sid", sessionId, {
       httpOnly: true,
       signed: true,
@@ -60,14 +60,14 @@ export const googleSignin = async (req, res, next) => {
   }
 }
 
-export const createSession = async (userId, rootDirId) => {
-  // const allSessions = await Session.find({ user: userId });
-  // if (allSessions.length >= 1) {
-  //   await allSessions[0].deleteOne();
-  // }
+export const createSession = async (userId, rootDirId, role) => {
+  const result = await redisClient.ft.search('userIdIdx', `@userId:{${userId}}`, {RETURN: []});
+  if (result.total >= 1) {
+    await redisClient.del(result.documents[0].id);
+  }
   const sessionId = crypto.randomUUID();
   const redisKey = `sessions:${sessionId}`;
-  await redisClient.json.set(redisKey, '$', {_id:userId, rootDirId});  
+  await redisClient.json.set(redisKey, '$', {_id:userId, rootDirId, role});  
   await redisClient.expire(redisKey, SESSION_EXPIRE_IN_SECONDS);
   return sessionId;
 }

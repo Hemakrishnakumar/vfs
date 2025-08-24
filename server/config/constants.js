@@ -3,7 +3,7 @@ config();
 
 export const PORT = process.env.PORT || 4000;
 
-export const SESSION_EXPIRE_IN_SECONDS = process.env || 3600;
+export const SESSION_EXPIRE_IN_SECONDS = process.env.SESSION_EXPIRE_IN_SECONDS || 3600;
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 export const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;

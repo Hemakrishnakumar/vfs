@@ -11,6 +11,8 @@ client.on('error', (err)=>{
 
 client.connect();
 
+
+// client.quit();
 export default client;
 
 
