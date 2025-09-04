@@ -8,6 +8,7 @@ export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 export const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
 
+export const GMAIL_USER_EMAIL = process.env.GMAIL_USER;
 export const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;

@@ -1,13 +1,14 @@
 import nodemailer from 'nodemailer';
 import OTP from "../models/otpModel.js";
+import { GMAIL_APP_PASSWORD, GMAIL_USER_EMAIL } from '../config/constants.js';
 
 // Create a test account or replace with real credentials.
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587, 
   auth: {
-    user: "dev.krish.learn@gmail.com",
-    pass: "miyf zswd jipo tymb",
+    user: GMAIL_USER_EMAIL,
+    pass: GMAIL_APP_PASSWORD,
   },
 });
 
