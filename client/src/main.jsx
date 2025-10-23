@@ -2,20 +2,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import AuthProvider from "./context/AuthContext.jsx";
-import { Toaster } from "react-hot-toast";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const clientId = "280455534344-88ke0uiaorctl65dsrvmv0p5ri2ssjj7.apps.googleusercontent.com";
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-createRoot(document.getElementById("root")).render(  
-    <AuthProvider>
-      <GoogleOAuthProvider clientId={clientId}>
-        <App />
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
-      </GoogleOAuthProvider>
-    </AuthProvider>  
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <GoogleOAuthProvider clientId={clientId}>
+      <App />
+    </GoogleOAuthProvider>
+  </StrictMode>
 );

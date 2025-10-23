@@ -3,8 +3,7 @@ import DirectoryView from "./DirectoryView";
 import Register from "./Register";
 import "./App.css";
 import Login from "./Login";
-import UsersView from "./UsersView";
-import Forbidden from "./Forbidden";
+import UsersPage from "./UsersPage";
 
 const router = createBrowserRouter([
   {
@@ -13,25 +12,20 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <Register />,    
+    element: <Register />,
   },
   {
     path: "/login",
     element: <Login />,
   },
   {
+    path: "/users",
+    element: <UsersPage />,
+  },
+  {
     path: "/directory/:dirId",
     element: <DirectoryView />,
   },
-  {
-    path: "/users",
-    element: <UsersView/>
-  },
-  {
-    path: 'forbidden', 
-    element: <Forbidden/>
-  }
-
 ]);
 
 function App() {
