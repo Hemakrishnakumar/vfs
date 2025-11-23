@@ -4,6 +4,7 @@ import mongoose, { Types } from "mongoose";
 import OTP from "../models/otpModel.js";
 import { createSession } from "./authController.js";
 import redisClient from '../config/redis.js'
+import { loginSchema, registerSchema } from "../validators/authSchema.js";
 
 export const createUserAndDirectory = async(data) => {
   const session = await mongoose.startSession(); 
@@ -35,7 +36,14 @@ export const createUserAndDirectory = async(data) => {
 };
 
 export const register = async (req, res, next) => {
-  const { name, email, password, otp } = req.body;
+  const {success, data, error} = registerSchema.safeParse(req.body);
+  if(!success) {
+    return res
+        .status(400)
+        .json({ error: "Invalid input, please enter valid details" });
+  }
+    
+  const { name, email, password, otp } = data;
   const otpRecord = await OTP.findOne({ email, otp });
 
   if (!otpRecord) {
@@ -68,7 +76,13 @@ export const register = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const {success, data, error} = loginSchema.safeParse(req.body);
+  if(!success) {
+    return res
+        .status(400)
+        .json({ error: error.issues });
+  }
+  const { email, password } = data;
   const user = await User.findOne({ email });
 
   if (!user || !(await user.comparePassword(password))) {

@@ -4,7 +4,9 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "build": "npm i",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +22,8 @@
     "mime-types": "^3.0.1",
     "mongoose": "^8.12.1",
     "nodemailer": "^7.0.4",
-    "redis": "^5.8.2"
+    "redis": "^5.8.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "prettier": "^3.4.2"

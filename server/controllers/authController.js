@@ -5,6 +5,7 @@ import { OAuth2Client } from "google-auth-library";
 import { createUserAndDirectory } from "./userController.js";
 import redisClient from "../config/redis.js";
 import { GOOGLE_CLIENT_ID, SESSION_EXPIRE_IN_SECONDS } from "../config/constants.js";
+import { otpSchema } from "../validators/authSchema.js";
 
 
 const client = new OAuth2Client({
@@ -22,12 +23,17 @@ const verifyToken = async (idToken) => {
 
 export const sendOtp = async (req, res, next) => {
   const { email } = req.body;
+  const user = await User.find({ email});
+  if(user) return res.status(409).json({ error: "this email already exists"})
   const resData = await sendOtpService(email);
   res.status(201).json(resData);
 };
 
 export const verifyOtp = async (req, res, next) => {
-  const { email, otp } = req.body;
+  const {success, data, error} = otpSchema.safeParse(req.body);
+  if(!success)
+    return res.status(400).json({message: 'please provide valid input', error: error.issues[0].message })
+  const { email, otp } = data;
   const otpRecord = await OTP.findOne({ email, otp });
 
   if (!otpRecord) {

@@ -34,11 +34,25 @@ export async function sendOtpService(email) {
   );
 
   const html = `
-    <div style="font-family:sans-serif;">
-      <h2>Your OTP is: ${otp}</h2>
-      <p>This OTP is valid for 10 minutes.</p>
+  <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 480px; margin: auto; padding: 24px; border-radius: 12px; background: #ffffff; border: 1px solid #e5e7eb;">
+    <h2 style="color: #111827; text-align: center;">Your Verification Code</h2>
+    
+    <p style="font-size: 15px; color: #374151;">
+      Use the OTP below to verify your email address. This code is valid for <strong>10 minutes</strong>.
+    </p>
+
+    <div style="margin: 24px auto; text-align: center;">
+      <div style="display: inline-block; padding: 14px 28px; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #111827; background: #f3f4f6; border-radius: 8px; border: 1px solid #d1d5db;">
+        ${otp}
+      </div>
     </div>
-  `;
+
+    <p style="font-size: 14px; color: #6b7280;">
+      If you did not request this, you can safely ignore this email.
+    </p>
+  </div>
+`;
+
 
   await sendMail({
     to: email,
