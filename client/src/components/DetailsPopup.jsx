@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
+import { formatSize } from "../utils/utils";
 
 function DetailsPopup({ item, onClose }) {
   if (!item) return null;
 
   const [details, setDetails] = useState({
     path: "/",
-    size: 0,
-    createdAt: new Date().toLocaleString(),
-    updatedAt: new Date().toLocaleString(),
+    size: item.size,
+    createdAt: new Date(item.createdAt).toLocaleString(),
+    updatedAt: new Date(item.updatedAt).toLocaleString(),
     numberOfFiles: 0,
     numberOfFolders: 0,
   });
@@ -42,7 +43,7 @@ function DetailsPopup({ item, onClose }) {
             <span className="font-semibold">Path:</span> {path}
           </div>
           <div>
-            <span className="font-semibold">Size:</span> {size}
+            <span className="font-semibold">Size:</span> {formatSize(size ?? 0)}
           </div>
           <div>
             <span className="font-semibold">Created At:</span> {createdAt}

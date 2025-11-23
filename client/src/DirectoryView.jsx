@@ -145,6 +145,7 @@ function DirectoryView() {
     xhr.open("POST", `http://localhost:4000/file/${dirId || ""}`);
     xhr.withCredentials = true;
     xhr.setRequestHeader("filename", currentItem.name);
+    xhr.setRequestHeader("filesize", currentItem.file.size);
 
     xhr.upload.addEventListener("progress", (evt) => {
       if (evt.lengthComputable) {

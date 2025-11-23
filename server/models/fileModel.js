@@ -18,8 +18,13 @@ const fileSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Directory",
     },
+    size: {
+      type: Number,
+      required: true
+    }
   },
   {
+    timestamps: true,
     strict: "throw",
   }
 );

@@ -17,6 +17,7 @@ const directorySchema = new Schema(
     },
   },
   {
+    timestamps: true,
     strict: "throw",
   }
 );
