@@ -27,21 +27,23 @@ export const createDirectory = async (req, res, next) => {
   const parentDirId = req.params.parentDirId || user.rootDirId.toString();
   const dirname = req.headers.dirname || "New Folder";
   try {
-    const parentDir = await Directory.findOne({
+    let parentDir = await Directory.findOne({
       _id: parentDirId,
-    }).lean();
+    });
 
     if (!parentDir)
       return res
         .status(404)
         .json({ message: "Parent Directory Does not exist!" });
-
+    
     await Directory.insertOne({
       name: dirname,
       parentDirId,
       userId: user._id,
     });
 
+    parentDir.directoryCount = parentDir.directoryCount + 1;
+    parentDir.save();
     return res.status(201).json({ message: "Directory Created!" });
   } catch (err) {
     if (err.code === 121) {
@@ -79,9 +81,7 @@ export const deleteDirectory = async (req, res, next) => {
     const directoryData = await Directory.findOne({
       _id: id,
       userId: req.user._id,
-    })
-      .select("_id")
-      .lean();
+    }).lean();
 
     if (!directoryData) {
       return res.status(404).json({ error: "Directory not found!" });
@@ -119,6 +119,7 @@ export const deleteDirectory = async (req, res, next) => {
     await Directory.deleteMany({
       _id: { $in: [...directories.map(({ _id }) => _id), id] },
     });
+    await Directory.findByIdAndUpdate({ _id: directoryData.parentDirId }, { $inc: { directoryCount: -1, size: -directoryData.size }, },)
   } catch (err) {
     next(err);
   }

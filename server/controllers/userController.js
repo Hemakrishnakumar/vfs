@@ -100,6 +100,7 @@ export const login = async (req, res, next) => {
 
 export const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user._id);
+  if(!user) return res.status(401).json({ error: "user no longer part of the system"})
   res.status(200).json({
     name: user.name,
     email: user.email,

@@ -1,4 +1,4 @@
-export function formatSize(bytes) {
+export function formatSize(bytes = 0) {
    const KB = 1024;
    const MB = KB * 1024;
    const GB = MB * 1024;

@@ -9,8 +9,8 @@ function DetailsPopup({ item, onClose }) {
     size: item.size,
     createdAt: new Date(item.createdAt).toLocaleString(),
     updatedAt: new Date(item.updatedAt).toLocaleString(),
-    numberOfFiles: 0,
-    numberOfFolders: 0,
+    numberOfFiles: item.fileCount,
+    numberOfFolders: item.directoryCount,
   });
 
   const { id, name, isDirectory } = item;

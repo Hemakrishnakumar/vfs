@@ -15,6 +15,21 @@ const directorySchema = new Schema(
       default: null,
       ref: "Directory",
     },
+    size: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    fileCount: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    directoryCount: {
+      type: Number,
+      required: true,
+      default: 0
+    },
   },
   {
     timestamps: true,
