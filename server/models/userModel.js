@@ -36,6 +36,11 @@ const userSchema = new Schema(
       type: String,
       enum: ['admin', 'user', 'manager'],
       default: 'user'
+    },
+    maxStorageSize: {
+      type: Number,
+      required: true,
+      default: 1024 ** 3
     }
   },
   {

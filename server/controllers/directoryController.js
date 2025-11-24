@@ -119,7 +119,10 @@ export const deleteDirectory = async (req, res, next) => {
     await Directory.deleteMany({
       _id: { $in: [...directories.map(({ _id }) => _id), id] },
     });
-    await Directory.findByIdAndUpdate({ _id: directoryData.parentDirId }, { $inc: { directoryCount: -1, size: -directoryData.size }, },)
+    let dir = await Directory.findOneAndUpdate({ _id: directoryData.parentDirId }, { $inc: { directoryCount: -1, size: -directoryData.size } }, { new: true})
+    while (dir?.parentDirId) {
+      let dir = await Directory.findOneAndUpdate({ _id: dir.parentDirId }, { $inc: { size: -directoryData.size }}, { new: true} );
+    }
   } catch (err) {
     next(err);
   }

@@ -8,6 +8,7 @@ import {
   FaSignOutAlt,
   FaSignInAlt,
 } from "react-icons/fa";
+import { formatSize } from "../utils/utils";
 
 function DirectoryHeader({
   directoryName,
@@ -23,6 +24,8 @@ function DirectoryHeader({
   const [userEmail, setUserEmail] = useState("guest@example.com");
   const [userPicture, setUserPicture] = useState("");
   const userMenuRef = useRef(null);
+  const [maxStorageSize, setMaxStorageSize] = useState(0);
+  const [usedStorageSize, setUsedStorageSize] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +35,8 @@ function DirectoryHeader({
         setUserName(data.name);
         setUserEmail(data.email);
         setLoggedIn(true);
+        setMaxStorageSize(data.maxStorageSize);
+        setUsedStorageSize(data.usedStorageSize)
       } catch (err) {
         setLoggedIn(false);
         setUserName("Guest User");
@@ -134,6 +139,12 @@ function DirectoryHeader({
                   <div className="px-3 py-2 text-sm text-gray-800">
                     <div className="font-semibold">{userName}</div>
                     <div className="text-xs text-gray-500">{userEmail}</div>
+                  </div>
+                  <div className="mx-2 my-2">
+                    <div className="h-[8px] bg-gray-200 rounded mb-0.5">
+                      <div className="h-[8px] bg-blue-600 rounded" style={{width: `${Math.round((usedStorageSize / maxStorageSize) * 100)}%`}}></div>                    
+                    </div>
+                    <span className="text-xs">{formatSize(usedStorageSize)} of {formatSize(maxStorageSize)} used</span>
                   </div>
                   <div className="border-t border-gray-200" />
                   <div

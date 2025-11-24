@@ -3,6 +3,7 @@ import { rm } from "fs/promises";
 import path from "path";
 import Directory from "../models/directoryModel.js";
 import File from "../models/fileModel.js";
+import User from "../models/userModel.js";
 
 export const uploadFile = async (req, res, next) => {
   const parentDirId = req.params.parentDirId || req.user.rootDirId;
@@ -15,12 +16,20 @@ export const uploadFile = async (req, res, next) => {
     // Check if parent directory exists
     if (!parentDirData) {
       return res.status(404).json({ error: "Parent directory not found!" });
-    }
+    }   
 
     const filename = req.headers.filename || "untitled";
     const size = Number(req.headers.filesize);
-    if(!size) return res.send(400, 'Bad Request')
-    if(size > 1024 * 1024 ) {
+    if(!size) return res.send(400, 'Bad Request');
+    let rootDirectory = parentDirData;
+    if (rootDirectory.parentDirId) {
+      rootDirectory = await Directory.find({ _id: req.user.rootDirId}).select('size');
+    }
+    const user = await User.findOne({ _id: req.user._id});   
+      
+    const allowedLimitForFile = 512 * 1024 * 1024 ;
+    // Return the error if user is trying to upload larger file or he has not enough space
+    if(size > allowedLimitForFile || (size + rootDirectory.size > user.maxStorageSize)) {
        res.header('Connection', 'close')
        return res.end();
     }
@@ -155,7 +164,7 @@ export const deleteFile = async (req, res, next) => {
     while(parentDirData?.parentDirId) {
         parentDirData = await Directory.findOneAndUpdate(
           { _id: parentDirData.parentDirId },
-          { $inc: { size: -file.size }, },
+          { $inc: { size: -file.size } },
           { new: true } 
         );
       }
