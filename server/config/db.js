@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
-import { DB_CONNECTION_STRING } from "./constants.js";
 
 export async function connectDB() {
   try {
-    await mongoose.connect(
-      DB_CONNECTION_STRING
-    );
-
+    await mongoose.connect(process.env.DB_URL);
     console.log("Database connected");
   } catch (err) {
     console.log(err);

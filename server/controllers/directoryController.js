@@ -1,11 +1,15 @@
-import { rm } from "fs/promises";
 import Directory from "../models/directoryModel.js";
 import File from "../models/fileModel.js";
+import { updateDirectoriesSize } from "./fileController.js";
+import { deleteS3Files } from "../services/s3.js";
 
 export const getDirectory = async (req, res) => {
   const user = req.user;
   const _id = req.params.id || user.rootDirId.toString();
-  const directoryData = await Directory.findOne({ _id }).lean();
+  const directoryData = await Directory.findOne({
+    _id,
+    userId: req.user._id,
+  }).lean();
   if (!directoryData) {
     return res
       .status(404)
@@ -27,23 +31,21 @@ export const createDirectory = async (req, res, next) => {
   const parentDirId = req.params.parentDirId || user.rootDirId.toString();
   const dirname = req.headers.dirname || "New Folder";
   try {
-    let parentDir = await Directory.findOne({
+    const parentDir = await Directory.findOne({
       _id: parentDirId,
-    });
+    }).lean();
 
     if (!parentDir)
       return res
         .status(404)
         .json({ message: "Parent Directory Does not exist!" });
-    
+
     await Directory.insertOne({
       name: dirname,
       parentDirId,
       userId: user._id,
     });
 
-    parentDir.directoryCount = parentDir.directoryCount + 1;
-    parentDir.save();
     return res.status(201).json({ message: "Directory Created!" });
   } catch (err) {
     if (err.code === 121) {
@@ -108,9 +110,15 @@ export const deleteDirectory = async (req, res, next) => {
 
     const { files, directories } = await getDirectoryContents(id);
 
-    for (const { _id, extension } of files) {
-      await rm(`./storage/${_id.toString()}${extension}`);
-    }
+    const keys = files.map(({ _id, extension }) => ({
+      Key: `${_id}${extension}`,
+    }));
+
+    console.log(keys);
+
+    const response = await deleteS3Files(keys);
+
+    console.log(response);
 
     await File.deleteMany({
       _id: { $in: files.map(({ _id }) => _id) },
@@ -119,10 +127,8 @@ export const deleteDirectory = async (req, res, next) => {
     await Directory.deleteMany({
       _id: { $in: [...directories.map(({ _id }) => _id), id] },
     });
-    let dir = await Directory.findOneAndUpdate({ _id: directoryData.parentDirId }, { $inc: { directoryCount: -1, size: -directoryData.size } }, { new: true})
-    while (dir?.parentDirId) {
-      let dir = await Directory.findOneAndUpdate({ _id: dir.parentDirId }, { $inc: { size: -directoryData.size }}, { new: true} );
-    }
+
+    await updateDirectoriesSize(directoryData.parentDirId, -directoryData.size);
   } catch (err) {
     next(err);
   }

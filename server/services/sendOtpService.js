@@ -1,14 +1,13 @@
 import nodemailer from 'nodemailer';
 import OTP from "../models/otpModel.js";
-import { GMAIL_APP_PASSWORD, GMAIL_USER_EMAIL } from '../config/constants.js';
 
-// Create a test account or replace with real credentials.
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587, 
   auth: {
-    user: GMAIL_USER_EMAIL,
-    pass: GMAIL_APP_PASSWORD,
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
 
@@ -26,7 +25,6 @@ const sendMail = async ({to, subject, html}) => {
 export async function sendOtpService(email) {
   const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-  // Upsert OTP (replace if it already exists)
   await OTP.findOneAndUpdate(
     { email },
     { otp, createdAt: new Date() },

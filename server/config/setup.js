@@ -13,7 +13,7 @@ try {
     validator: {
       $jsonSchema: {
         bsonType: "object",
-        required: ["_id", "name", "email", "password", "rootDirId"],
+        required: ["_id", "name", "email", "rootDirId"],
         properties: {
           _id: {
             bsonType: "objectId",
@@ -23,6 +23,9 @@ try {
             minLength: 3,
             description:
               "name field should a string with at least three characters",
+          },
+          maxStorageInBytes: {
+            bsonType: "long",
           },
           email: {
             bsonType: "string",
@@ -35,6 +38,15 @@ try {
           },
           rootDirId: {
             bsonType: "objectId",
+          },
+          picture: {
+            bsonType: "string",
+          },
+          role: {
+            enum: ["Admin", "Manager", "User"],
+          },
+          deleted: {
+            bsonType: "bool",
           },
           __v: {
             bsonType: "int",
@@ -60,11 +72,20 @@ try {
           name: {
             bsonType: "string",
           },
+          size: {
+            bsonType: "int",
+          },
           userId: {
             bsonType: "objectId",
           },
           parentDirId: {
             bsonType: ["objectId", "null"],
+          },
+          createdAt: {
+            bsonType: "date",
+          },
+          updatedAt: {
+            bsonType: "date",
           },
           __v: {
             bsonType: "int",
@@ -90,6 +111,9 @@ try {
           name: {
             bsonType: "string",
           },
+          size: {
+            bsonType: "int",
+          },
           extension: {
             bsonType: "string",
           },
@@ -98,6 +122,12 @@ try {
           },
           parentDirId: {
             bsonType: "objectId",
+          },
+          createdAt: {
+            bsonType: "date",
+          },
+          updatedAt: {
+            bsonType: "date",
           },
           __v: {
             bsonType: "int",

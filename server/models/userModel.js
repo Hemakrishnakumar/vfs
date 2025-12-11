@@ -20,28 +20,33 @@ const userSchema = new Schema(
         "please enter a valid email",
       ],
     },
-    picture: {
-      type: String,
-      default: "https://cdn.vectorstock.com/i/1000v/66/13/default-avatar-profile-icon-social-media-user-vector-49816613.jpg"
-    },
     password: {
-      type: String,      
+      type: String,
       minLength: 4,
     },
     rootDirId: {
       type: Schema.Types.ObjectId,
       ref: "Directory",
     },
+    picture: {
+      type: String,
+      default:
+        "https://static.vecteezy.com/system/resources/previews/002/318/271/non_2x/user-profile-icon-free-vector.jpg",
+    },
     role: {
       type: String,
-      enum: ['admin', 'user', 'manager'],
-      default: 'user'
+      enum: ["Admin", "Manager", "User"],
+      default: "User",
     },
-    maxStorageSize: {
+    maxStorageInBytes: {
       type: Number,
       required: true,
-      default: 1024 ** 3
-    }
+      default: 1 * 1024 ** 3,
+    },
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: "throw",
@@ -49,7 +54,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.password || !this.isModified("password")) return next();
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });

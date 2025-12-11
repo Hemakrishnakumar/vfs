@@ -8,7 +8,6 @@ import {
   FaSignOutAlt,
   FaSignInAlt,
 } from "react-icons/fa";
-import { formatSize } from "../utils/utils";
 
 function DirectoryHeader({
   directoryName,
@@ -23,20 +22,23 @@ function DirectoryHeader({
   const [userName, setUserName] = useState("Guest User");
   const [userEmail, setUserEmail] = useState("guest@example.com");
   const [userPicture, setUserPicture] = useState("");
+  const [maxStorageInBytes, setMaxStorageInBytes] = useState(1073741824);
+  const [usedStorageInBytes, setUsedStorageInBytes] = useState(0);
+  const usedGB = usedStorageInBytes / 1024 ** 3;
+  const totalGB = maxStorageInBytes / 1024 ** 3;
+
   const userMenuRef = useRef(null);
-  const [maxStorageSize, setMaxStorageSize] = useState(0);
-  const [usedStorageSize, setUsedStorageSize] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function loadUser() {
       try {
-        const data = await fetchUser();
-        setUserName(data.name);
-        setUserEmail(data.email);
+        const user = await fetchUser();
+        setUserName(user.name);
+        setUserEmail(user.email);
+        setMaxStorageInBytes(user.maxStorageInBytes);
+        setUsedStorageInBytes(user.usedStorageInBytes);
         setLoggedIn(true);
-        setMaxStorageSize(data.maxStorageSize);
-        setUsedStorageSize(data.usedStorageSize)
       } catch (err) {
         setLoggedIn(false);
         setUserName("Guest User");
@@ -113,7 +115,6 @@ function DirectoryHeader({
           id="file-upload"
           type="file"
           className="hidden"
-          multiple
           onChange={handleFileSelect}
         />
         <div className="relative flex" ref={userMenuRef}>
@@ -139,12 +140,17 @@ function DirectoryHeader({
                   <div className="px-3 py-2 text-sm text-gray-800">
                     <div className="font-semibold">{userName}</div>
                     <div className="text-xs text-gray-500">{userEmail}</div>
-                  </div>
-                  <div className="mx-2 my-2">
-                    <div className="h-[8px] bg-gray-200 rounded mb-0.5">
-                      <div className="h-[8px] bg-blue-600 rounded" style={{width: `${Math.round((usedStorageSize / maxStorageSize) * 100)}%`}}></div>                    
+                    <div className="flex flex-col text-xs mr-2 mt-2">
+                      <div className="w-40 h-1 bg-gray-300 rounded-full overflow-hidden mb-1">
+                        <div
+                          className="bg-blue-500 rounded-full h-full"
+                          style={{ width: `${(usedGB / totalGB) * 100}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs">
+                        {usedGB.toFixed(2)} GB of {totalGB} GB used
+                      </div>
                     </div>
-                    <span className="text-xs">{formatSize(usedStorageSize)} of {formatSize(maxStorageSize)} used</span>
                   </div>
                   <div className="border-t border-gray-200" />
                   <div

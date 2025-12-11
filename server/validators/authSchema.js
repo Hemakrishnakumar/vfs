@@ -1,16 +1,23 @@
-import { z } from 'zod';
+import { z } from "zod/v4";
 
 export const loginSchema = z.object({
-    email: z.email("please provide valid email"),
-    password: z.string()
-})
+  email: z.email("Please enter a valid email"),
+  password: z.string(),
+});
 
 export const otpSchema = z.object({
-    email: z.email("please provide valid email"),
-    otp: z.string().length(4, "otp must be 4 charatcter long")
-})
+  email: z.email("Please enter a valid email"),
+  otp: z
+    .string("Please enter a valid 4 digit OTP string")
+    .regex(/^\d{4}$/, "Please enter a valid 4 digit OTP"),
+});
 
 export const registerSchema = loginSchema.extend({
-    name: z.string().min(3, "name must be 3 characters long").max(100, "name should not exceed 100 characters"),
-    otp: z.string().length(4, "otp must be 4 characters long and only contain numeric digits")
-})
+  name: z
+    .string()
+    .min(3, "Name should be at least 3 characters")
+    .max(100, "Name can be at max 100 characters"),
+  otp: z
+    .string("Please enter a valid 4 digit OTP string")
+    .regex(/^\d{4}$/, "Please enter a valid 4 digit OTP"),
+});
