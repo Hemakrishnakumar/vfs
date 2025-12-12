@@ -16,6 +16,10 @@ import {
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.status(200).send('<h1>Server is running. This is VFS Backend</h1>')
+})
+
 router.post("/user/register", register);
 
 router.post("/user/login", login);
