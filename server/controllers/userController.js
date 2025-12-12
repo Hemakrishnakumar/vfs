@@ -114,6 +114,7 @@ export const login = async (req, res, next) => {
   await redisClient.json.set(redisKey, "$", {
     userId: user._id,
     rootDirId: user.rootDirId,
+    
   });
 
   const sessionExpiryTime = 60 * 1000 * 60 * 24 * 7;
@@ -122,7 +123,7 @@ export const login = async (req, res, next) => {
   res.cookie("sid", sessionId, {
     httpOnly: true,
     signed: true,
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: sessionExpiryTime,
   });
   res.json({ message: "logged in" });
