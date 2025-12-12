@@ -1,7 +1,7 @@
+import dotenv from 'dotenv'
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from 'dotenv'
 import directoryRoutes from "./routes/directoryRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -9,7 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
 
-dotenv.config({ debug: true });
+dotenv.config();
 await connectDB();
 
 const PORT = process.env.PORT || 4000;
