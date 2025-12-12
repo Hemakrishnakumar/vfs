@@ -4,7 +4,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --no-deprecation --env-file=.env app.js",
+    "dev": "nodemon app.js",
     "setup": "node --env-file=.env config/setup.js",
     "build": "npm install",
     "start": "node app.js"
