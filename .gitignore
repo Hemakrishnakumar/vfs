@@ -4,4 +4,4 @@ server/node_modules
 client/.env
 server/.env
 server/storage
-private_key.pem
+server/private_key.pem

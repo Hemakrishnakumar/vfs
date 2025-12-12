@@ -47,7 +47,7 @@ function ContextMenu({ item, isUploadingItem }) {
       <div
         className={itemClass}
         onClick={() =>
-          (window.open(`http://localhost:4000/file/${item.id}?action=download`, '_blank'))
+          window.location.href = `http://localhost:4000/file/${item.id}?action=download`
         }
       >
         Download

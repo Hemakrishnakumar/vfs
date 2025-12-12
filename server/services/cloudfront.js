@@ -2,7 +2,7 @@ import { getSignedUrl } from "@aws-sdk/cloudfront-signer";
 import fs from 'fs';
 import path from "path";
 
-const __dirname = path.dirname(process.cwd());
+const __dirname = process.cwd();
 const keyPath = path.join(__dirname, 'private_key.pem');
 
 const privateKey = fs.readFileSync(keyPath, 'utf8');
