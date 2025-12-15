@@ -40,11 +40,11 @@ jobs:
           fi
 
   deploy:
-    name: Deploy to EC2
+    name: Deploy vfs-server to EC2
     runs-on: ubuntu-latest
     needs: build
 
-    # 🔒 Deploy ONLY from master
+    # 🔒 Deploy ONLY from main
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -58,29 +58,29 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy vfs-server to EC2
+      - name: Deploy to EC2
+        env:
+          APP_PATH: ${{ secrets.EC2_APP_PATH }}
+          REPO: ${{ github.repository }}
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
             set -e
 
-            # Create app directory if not exists
-            mkdir -p ${{ secrets.EC2_APP_PATH }}
+            echo "Deploying to \$APP_PATH"
 
-            # Go to app directory
-            cd ${{ secrets.EC2_APP_PATH }}
+            mkdir -p "\$APP_PATH"
+            cd "\$APP_PATH"
 
-            # If repo already exists, pull; else clone
             if [ -d ".git" ]; then
               git pull origin main
             else
-              git clone https://github.com/${{ github.repository }} .
+              git clone https://github.com/\$REPO .
             fi
 
             cd server
 
             npm ci --omit=dev
 
-            # Restart using PM2
             pm2 delete vfs-server || true
             pm2 start app.js --name vfs-server
 
