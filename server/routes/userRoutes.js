@@ -17,7 +17,7 @@ import {
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.status(200).send('<h1>Server is running. This is VFS Backend</h1>')
+  res.status(200).send('<h1>Hey, Server is running. This is VFS Backend</h1>')
 })
 
 router.post("/user/register", register);
