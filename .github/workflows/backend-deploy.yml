@@ -40,49 +40,32 @@ jobs:
           fi
 
   deploy:
-    name: Deploy vfs-server to EC2
-    runs-on: ubuntu-latest
-    needs: build
+    name: Deploy to EC2
+    env:
+      APP_PATH: '${{ secrets.EC2_APP_PATH }}'
+      REPO: '${{ github.repository }}'
+  run: >
+    ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "APP_PATH='$APP_PATH'
+    REPO='$REPO' bash -s" << 'EOF'
+      set -e
 
-    # 🔒 Deploy ONLY from main
-    if: github.ref == 'refs/heads/main'
+      echo "Deploying to $APP_PATH"
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      mkdir -p "$APP_PATH"
+      cd "$APP_PATH"
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      if [ -d ".git" ]; then
+        git pull origin main
+      else
+        git clone https://github.com/$REPO .
+      fi
 
-      - name: Deploy to EC2
-        env:
-          APP_PATH: ${{ secrets.EC2_APP_PATH }}
-          REPO: ${{ github.repository }}
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
-            set -e
+      cd server
 
-            echo "Deploying to \$APP_PATH"
+      npm ci --omit=dev
 
-            mkdir -p "\$APP_PATH"
-            cd "\$APP_PATH"
+      pm2 delete vfs-server || true
+      pm2 start app.js --name vfs-server
 
-            if [ -d ".git" ]; then
-              git pull origin main
-            else
-              git clone https://github.com/\$REPO .
-            fi
-
-            cd server
-
-            npm ci --omit=dev
-
-            pm2 delete vfs-server || true
-            pm2 start app.js --name vfs-server
-
-            pm2 save
-          EOF
+      pm2 save
+    EOF
