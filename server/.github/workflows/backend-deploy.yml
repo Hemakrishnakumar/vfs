@@ -3,12 +3,12 @@ name: vfs-server CI/CD
 on:
   push:
     branches:
-      - master
+      - main
       - feature/**
       - fix/**
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -45,7 +45,7 @@ jobs:
     needs: build
 
     # 🔒 Deploy ONLY from master
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -71,7 +71,7 @@ jobs:
 
             # If repo already exists, pull; else clone
             if [ -d ".git" ]; then
-              git pull origin master
+              git pull origin main
             else
               git clone https://github.com/${{ github.repository }} .
             fi
