@@ -1,7 +1,7 @@
 import { axiosWithCreds } from "./axiosInstances";
 
 export const getDirectoryItems = async (dirId = "") => {
-  const { data } = await axiosWithCreds.get(`/directory/${dirId}`);
+  const { data } = await axiosWithCreds.get(`directory/${dirId}`);
   return data;
 };
 

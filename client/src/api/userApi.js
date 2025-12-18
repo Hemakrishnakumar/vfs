@@ -1,7 +1,7 @@
 import { axiosWithCreds, axiosWithoutCreds } from "./axiosInstances";
 
 export const fetchUser = async () => {
-  const { data } = await axiosWithCreds.get("/user");
+  const { data } = await axiosWithCreds.get("user");
   return data;
 };
 

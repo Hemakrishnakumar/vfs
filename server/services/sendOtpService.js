@@ -1,13 +1,14 @@
 import nodemailer from 'nodemailer';
 import OTP from "../models/otpModel.js";
+import { NODEMAILER_GMAIL_APP_PASSWORD, NODEMAILER_GMAIL_USER } from '../config/constants.js';
 
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587, 
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: NODEMAILER_GMAIL_USER,
+    pass: NODEMAILER_GMAIL_APP_PASSWORD,
   },
 });
 

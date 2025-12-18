@@ -133,6 +133,7 @@ export const uploadInitiate = async (req, res) => {
     res.json({ uploadSignedUrl, fileId: insertedFile.id });
   } catch (err) {
     console.log(err);
+    res.status(500).json({error:'something went wrong'})
   }
 };
 

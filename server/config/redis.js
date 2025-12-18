@@ -1,10 +1,8 @@
 import { createClient } from "redis";
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { REDIS_CONNECTION_STRING } from "./constants.js";
 
 const redisClient = createClient({
-  url: process.env.REDIS_CONNECTION_STRING
+  url: REDIS_CONNECTION_STRING
 });
 
 

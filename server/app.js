@@ -1,4 +1,3 @@
-import dotenv from 'dotenv'
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -8,18 +7,16 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
+import { CLIENT_APP_URL, PORT, SESSION_SECRET } from './config/constants.js';
 
-dotenv.config();
 await connectDB();
 
-const PORT = process.env.PORT || 4000;
-
 const app = express();
-app.use(cookieParser(process.env.SESSION_SECRET));
+app.use(cookieParser(SESSION_SECRET));
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: CLIENT_APP_URL,
     credentials: true,
   })
 );
@@ -36,7 +33,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server Started`);
+  console.log(`Server Started and running on ${PORT}`);
 });
 
 

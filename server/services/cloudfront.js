@@ -1,12 +1,13 @@
 import { getSignedUrl } from "@aws-sdk/cloudfront-signer";
 import fs from 'fs';
 import path from "path";
+import { CLOUDFRONT_KEY_ID } from "../config/constants.js";
 
 const __dirname = process.cwd();
 const keyPath = path.join(__dirname, 'private_key.pem');
 
 const privateKey = fs.readFileSync(keyPath, 'utf8');
-const keyPairId = process.env.CLOUDFRONT_KEY_ID;
+const keyPairId = CLOUDFRONT_KEY_ID;
 const dateLessThan = new Date(Date.now() + 1000 * 60 * 60).toISOString(); // any Date constructor compatible
 const distributionName = `https://d1n533sqdi8401.cloudfront.net`;
 

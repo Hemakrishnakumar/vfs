@@ -7,11 +7,13 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3_ACCESS_KEY, S3_SECRET_KEY } from "../config/constants.js";
+
 
 const s3Client = new S3Client({
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY
+    accessKeyId: S3_ACCESS_KEY,
+    secretAccessKey: S3_SECRET_KEY
   },
   region: 'ap-south-1'
  });
@@ -69,7 +71,7 @@ export const deleteS3File = async (key) => {
   return await s3Client.send(command);
 };
 
-export const deleteS3Files = async (keys) => {
+export const deleteS3Files = async (keys) => {  
   const command = new DeleteObjectsCommand({
     Bucket: BUCKET_NAME,
     Delete: {
