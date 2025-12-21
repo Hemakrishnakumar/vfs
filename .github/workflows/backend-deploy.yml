@@ -1,6 +1,5 @@
 name: vfs-server CI/CD
-
-on:
+'on':
   push:
     branches:
       - main
@@ -9,28 +8,22 @@ on:
   pull_request:
     branches:
       - main
-
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: server
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run build (if exists)
         run: |
           if npm run | grep -q "build"; then
@@ -38,26 +31,45 @@ jobs:
           else
             echo "No build script found, skipping..."
           fi
-
-  deploy:
-    name: Deploy to EC2
+  security:
+    name: Security Checks (Pre-Deploy)
     runs-on: ubuntu-latest
     needs: build
-
-    # Deploy ONLY from main
     if: github.ref == 'refs/heads/main'
-
+    defaults:
+      run:
+        working-directory: server
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Snyk
+        run: npm install -g snyk
+      - name: Authenticate Snyk
+        run: 'snyk auth ${{ secrets.SNYK_TOKEN }}'
+      - name: 'Snyk test (block CRITICAL, report HIGH)'
+        run: snyk test --severity-threshold=critical
+      - name: npm audit (report only)
+        run: npm audit || true
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: security
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
       - name: Deploy backend to EC2
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
