@@ -56,6 +56,8 @@ jobs:
         run: snyk test --severity-threshold=critical
       - name: npm audit (report only)
         run: npm audit || true
+      - name: Snyk Code Analysis (report only)
+        run: snyk code test || true
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
