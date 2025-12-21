@@ -1,0 +1,33 @@
+name: Snyk PR Security Check (Server)
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  snyk-pr:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Snyk
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk test (CRITICAL only)
+        run: snyk test --severity-threshold=critical
