@@ -58,6 +58,9 @@ jobs:
         run: npm audit || true
       - name: Snyk Code Analysis (report only)
         run: snyk code test || true
+      - name: Upload Snyk Code results to dashboard
+        run: snyk monitor
+
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
