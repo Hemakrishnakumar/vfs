@@ -14,3 +14,11 @@ redisClient.on("error", (err) => {
 await redisClient.connect();
 
 export default redisClient;
+
+export function testDup() {
+  console.log("a");
+  console.log("b");
+  console.log("c");
+  console.log("d");
+  console.log("e");
+}
