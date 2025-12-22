@@ -1,0 +1,47 @@
+name: SonarQube PR Analysis
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonar-pr:
+    name: SonarQube PR Scan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server   
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # REQUIRED for Sonar
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Optional but recommended if you have tests
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+        continue-on-error: true
+
+      - name: SonarQube Scan (PR)
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=<ORG>_vfs
+            -Dsonar.organization=<ORG>
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+            -Dsonar.pullrequest.base=main
