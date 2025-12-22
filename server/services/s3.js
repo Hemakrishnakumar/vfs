@@ -82,3 +82,11 @@ export const deleteS3Files = async (keys) => {
 
   return await s3Client.send(command);
 };
+
+export function testDup() {
+  console.log("a");
+  console.log("b");
+  console.log("c");
+  console.log("d");
+  console.log("e");
+}
