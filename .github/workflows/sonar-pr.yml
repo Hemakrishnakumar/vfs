@@ -40,8 +40,8 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.projectKey=<ORG>_vfs
-            -Dsonar.organization=<ORG>
+            -Dsonar.projectKey=Krishna_vfs
+            -Dsonar.organization=Krishna
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
             -Dsonar.pullrequest.branch=${{ github.head_ref }}
             -Dsonar.pullrequest.base=main
