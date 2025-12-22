@@ -8,7 +8,11 @@ import redisClient from "../config/redis.js";
 import { otpSchema } from "../validators/authSchema.js";
 
 export const sendOtp = async (req, res, next) => {
-  const { email } = req.body;
+  const { success, data } = emailSchema.safeParse(req.body);
+  if (!success) {
+    return res.status(400).json({ error: "Invalid email" });
+  }
+  const { email } = data;
   const user = await User.findOne({ email });
   if(user) return res.status(409).json({ error: "this email already exists"})
   const resData = await sendOtpService(email);

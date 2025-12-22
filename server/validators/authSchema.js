@@ -5,6 +5,10 @@ export const loginSchema = z.object({
   password: z.string(),
 });
 
+export const emailSchema = z.object({
+  email: z.email("Please enter a valid email"),
+});
+
 export const otpSchema = z.object({
   email: z.email("Please enter a valid email"),
   otp: z
