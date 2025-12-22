@@ -34,7 +34,7 @@ jobs:
         continue-on-error: true
 
       - name: SonarQube Scan (PR)
-        uses: SonarSource/sonarqube-scan-action@v2
+        uses: SonarSource/sonarqube-scan-action@aecaf43ae57e412bd97d70ef9ce6076e672fe0a9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
