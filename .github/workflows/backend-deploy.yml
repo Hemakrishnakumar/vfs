@@ -5,9 +5,9 @@ name: vfs-server CI/CD
       - main
       - feature/**
       - fix/**
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
 jobs:
   build:
     name: Build
