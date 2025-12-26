@@ -27,7 +27,7 @@
     "mongoose": "^8.12.1",
     "nodemailer": "^7.0.11",
     "redis": "^5.10.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "prettier": "^3.4.2"
